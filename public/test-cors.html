@@ -81,6 +81,14 @@
             background: #e0a800;
         }
         
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
         .result {
             padding: 15px;
             border-radius: 8px;
@@ -188,18 +196,24 @@
             margin: 15px 0;
         }
         
-        .log-entry {
-            font-family: 'Courier New', monospace;
-            font-size: 0.8rem;
-            margin: 5px 0;
-            padding: 5px;
-            border-radius: 4px;
-            background: #f8f9fa;
-        }
-        
         .timestamp {
             color: #6c757d;
             font-size: 0.7rem;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0088cc;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -209,7 +223,7 @@
             <h1>🔧 Тестирование CORS и API</h1>
             <p>Комплексная проверка подключения к бэкенду Telegram Camera Bot</p>
             <div style="margin-top: 10px; font-size: 0.9rem;">
-                👤 Александр Горчков | 🆔 1189539923
+                👤 Александр Горчаков | 🆔 1189539923
             </div>
         </div>
         
@@ -220,6 +234,7 @@
                 <p><strong>Frontend URL:</strong> <code id="frontendUrl">Загрузка...</code></p>
                 <p><strong>User ID:</strong> <code>1189539923</code></p>
                 <p><strong>Текущее время:</strong> <span id="currentTime"></span></p>
+                <p><strong>Статус CORS:</strong> <span id="corsStatus">Проверка...</span></p>
             </div>
             
             <div class="stats">
@@ -243,8 +258,9 @@
             
             <div style="margin: 20px 0;">
                 <button class="btn btn-success" onclick="testAllEndpoints()">🧪 Протестировать все endpoints</button>
-                <button class="btn" onclick="testCorsPreflight()">🔄 Тест CORS Preflight</button>
-                <button class="btn btn-warning" onclick="testBase64Validation()">📷 Тест Base64</button>
+                <button class="btn" onclick="testBasicConnection()">🔗 Тест базового подключения</button>
+                <button class="btn btn-warning" onclick="testCorsPreflight()">🔄 Тест CORS Preflight</button>
+                <button class="btn btn-danger" onclick="testWithoutCors()">🚫 Тест без CORS</button>
                 <button class="btn btn-secondary" onclick="clearResults()">🗑️ Очистить результаты</button>
             </div>
             
@@ -302,7 +318,7 @@
             <h3>📊 Результаты тестирования</h3>
             <div id="results">
                 <div class="result info">
-                    Готов к тестированию! Нажмите кнопку "Протестировать все endpoints" для начала проверки.
+                    Готов к тестированию! Нажмите кнопку "Тест базового подключения" для начала проверки.
                     
                     Тестируемые домены:
                     - Backend: https://telegram-camera-bot-production.up.railway.app
@@ -313,7 +329,13 @@
             <div style="margin-top: 15px;">
                 <button class="btn btn-secondary" onclick="exportResults()">💾 Экспорт результатов</button>
                 <button class="btn btn-secondary" onclick="showTechnicalInfo()">🔧 Техническая информация</button>
+                <button class="btn btn-secondary" onclick="showDebugInfo()">🐛 Debug информация</button>
             </div>
+        </div>
+
+        <div class="card" id="debugSection" style="display: none;">
+            <h3>🐛 Debug информация</h3>
+            <div id="debugInfo"></div>
         </div>
     </div>
 
@@ -326,10 +348,16 @@
             corsErrors: 0
         };
         
-        // Показываем текущий URL фронтенда и время
-        document.getElementById('frontendUrl').textContent = window.location.origin;
-        document.getElementById('currentOrigin').textContent = window.location.origin;
-        updateCurrentTime();
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            // Показываем текущий URL фронтенда и время
+            document.getElementById('frontendUrl').textContent = window.location.origin;
+            document.getElementById('currentOrigin').textContent = window.location.origin;
+            updateCurrentTime();
+            
+            // Автоматически проверяем базовое подключение
+            setTimeout(testBasicConnection, 1000);
+        });
         
         function updateCurrentTime() {
             document.getElementById('currentTime').textContent = new Date().toLocaleString('ru-RU');
@@ -361,6 +389,16 @@
             testResults.completed++;
             updateStats();
         }
+
+        function showLoading(button) {
+            const originalText = button.innerHTML;
+            button.innerHTML = '<div class="loading"></div> Загрузка...';
+            button.disabled = true;
+            return () => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            };
+        }
         
         function clearResults() {
             document.getElementById('results').innerHTML = '<div class="result info">Результаты очищены</div>';
@@ -368,9 +406,53 @@
             updateStats();
         }
         
+        async function testBasicConnection() {
+            const url = BACKEND_URL + '/';
+            const startTime = Date.now();
+            
+            addResult(`🔍 Тестирование базового подключения: GET ${url}`, 'info');
+            document.getElementById('corsStatus').innerHTML = '<div class="loading"></div> Проверка...';
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const duration = Date.now() - startTime;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('corsStatus').innerHTML = '✅ CORS работает';
+                    document.getElementById('corsStatus').style.color = 'green';
+                    addResult(`✅ УСПЕХ: Базовое подключение (${duration}ms)\nСтатус: ${data.status || 'OK'}\nCORS: ✅ Работает\nПользователь: ${data.user || 'Unknown'}`, 'success');
+                } else {
+                    document.getElementById('corsStatus').innerHTML = '❌ Ошибка подключения';
+                    document.getElementById('corsStatus').style.color = 'red';
+                    addResult(`❌ ОШИБКА: HTTP ${response.status}: ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                const duration = Date.now() - startTime;
+                document.getElementById('corsStatus').innerHTML = '❌ CORS ошибка';
+                document.getElementById('corsStatus').style.color = 'red';
+                
+                addResult(`❌ ОШИБКА: Не удалось подключиться (${duration}ms)\n${error.name}: ${error.message}`, 'error');
+                
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    addResult('⚠️ ВОЗМОЖНА CORS ОШИБКА: Браузер блокирует запрос из-за политики CORS', 'warning');
+                    addResult('💡 РЕШЕНИЕ: Проверьте настройки CORS на сервере. Сервер должен разрешать запросы с вашего домена.', 'info');
+                }
+            }
+        }
+        
         async function testEndpoint(endpoint, method = 'GET') {
             const url = BACKEND_URL + endpoint;
             const startTime = Date.now();
+            const button = event.target;
+            const resetButton = showLoading(button);
             
             addResult(`🔍 Тестирование: ${method} ${url}`, 'info');
             
@@ -398,12 +480,16 @@
                 if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
                     addResult('⚠️ ВОЗМОЖНА CORS ОШИБКА: Проверьте настройки CORS на сервере', 'warning');
                 }
+            } finally {
+                resetButton();
             }
         }
         
         async function testPhotoEndpoint() {
             const url = BACKEND_URL + '/api/send-photo';
             const startTime = Date.now();
+            const button = event.target;
+            const resetButton = showLoading(button);
             
             addResult(`🔍 Тестирование: POST ${url}`, 'info');
             
@@ -430,7 +516,7 @@
                 if (response.ok && result.success) {
                     addResult(`✅ УСПЕХ: Фото отправлено (${duration}ms)\nMessage ID: ${result.message_id}\nCORS: ✅ Работает`, 'success');
                 } else {
-                    addResult(`❌ ОШИБКА: Не удалось отправить фото (${duration}ms)\nОшибка: ${result.error || 'Unknown error'}`, 'error');
+                    addResult(`❌ ОШИБКА: Не удалось отправить фото (${duration}ms)\nОшибка: ${result.error || 'Unknown error'}\nДетали: ${JSON.stringify(result)}`, 'error');
                 }
             } catch (error) {
                 const duration = Date.now() - startTime;
@@ -439,12 +525,16 @@
                 if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
                     addResult('⚠️ ВОЗМОЖНА CORS ОШИБКА: Проверьте настройки CORS на сервере', 'warning');
                 }
+            } finally {
+                resetButton();
             }
         }
         
         async function testBase64Endpoint() {
             const url = BACKEND_URL + '/api/test-base64';
             const startTime = Date.now();
+            const button = event.target;
+            const resetButton = showLoading(button);
             
             addResult(`🔍 Тестирование: POST ${url}`, 'info');
             
@@ -473,12 +563,16 @@
             } catch (error) {
                 const duration = Date.now() - startTime;
                 addResult(`❌ ОШИБКА: ${url} (${duration}ms)\n${error.message}`, 'error');
+            } finally {
+                resetButton();
             }
         }
         
         async function testCorsPreflight() {
             const url = BACKEND_URL + '/api/send-photo';
             const startTime = Date.now();
+            const button = event.target;
+            const resetButton = showLoading(button);
             
             addResult(`🔍 Тестирование CORS Preflight: OPTIONS ${url}`, 'info');
             
@@ -509,54 +603,36 @@
             } catch (error) {
                 const duration = Date.now() - startTime;
                 addResult(`❌ ОШИБКА: CORS Preflight (${duration}ms)\n${error.message}`, 'error');
+            } finally {
+                resetButton();
             }
         }
-        
-        async function testBase64Validation() {
-            addResult(`🔍 Тестирование Base64 валидации`, 'info');
+
+        async function testWithoutCors() {
+            const url = BACKEND_URL + '/';
+            const startTime = Date.now();
+            const button = event.target;
+            const resetButton = showLoading(button);
             
-            // Тест различных форматов Base64
-            const testCases = [
-                {
-                    name: 'Valid Base64 with data URL',
-                    data: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=',
-                    shouldBeValid: true
-                },
-                {
-                    name: 'Invalid Base64',
-                    data: 'invalid-base64-data!!!',
-                    shouldBeValid: false
-                },
-                {
-                    name: 'Empty data',
-                    data: '',
-                    shouldBeValid: false
-                }
-            ];
+            addResult(`🔍 Тестирование без CORS: GET ${url}`, 'info');
             
-            for (const testCase of testCases) {
-                try {
-                    const response = await fetch(BACKEND_URL + '/api/test-base64', {
-                        method: 'POST',
-                        mode: 'cors',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            photo_data: testCase.data
-                        })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.valid === testCase.shouldBeValid) {
-                        addResult(`✅ ${testCase.name}: ${result.valid ? 'VALID' : 'INVALID'}`, 'success');
-                    } else {
-                        addResult(`❌ ${testCase.name}: ожидалось ${testCase.shouldBeValid}, получено ${result.valid}`, 'error');
-                    }
-                } catch (error) {
-                    addResult(`❌ ${testCase.name}: ${error.message}`, 'error');
-                }
+            try {
+                // Пытаемся сделать запрос без CORS (будет заблокирован браузером)
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+                
+                const duration = Date.now() - startTime;
+                
+                // В режиме no-cors response всегда будет opaque, мы не можем прочитать ответ
+                addResult(`⚠️ Запрос в режиме no-cors завершен (${duration}ms)\nСтатус: Response будет opaque\nЭто нормально - браузер блокирует чтение ответа без CORS`, 'warning');
+                
+            } catch (error) {
+                const duration = Date.now() - startTime;
+                addResult(`❌ ОШИБКА: Запрос без CORS (${duration}ms)\n${error.message}`, 'error');
+            } finally {
+                resetButton();
             }
         }
         
@@ -577,14 +653,14 @@
             
             for (const endpoint of endpoints) {
                 await testEndpoint(endpoint.path, endpoint.method);
-                await new Promise(resolve => setTimeout(resolve, 500)); // Задержка между запросами
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Задержка между запросами
             }
             
             // Тестируем POST endpoints
             await testPhotoEndpoint();
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             await testBase64Endpoint();
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             await testCorsPreflight();
             
             addResult(`📊 ТЕСТИРОВАНИЕ ЗАВЕРШЕНО: Успешно ${testResults.success} из ${testResults.completed}`, 
@@ -624,6 +700,41 @@ Local Time: ${new Date().toString()}
             `.trim();
             
             addResult(`🔧 ТЕХНИЧЕСКАЯ ИНФОРМАЦИЯ:\n${techInfo}`, 'info');
+        }
+
+        function showDebugInfo() {
+            const debugSection = document.getElementById('debugSection');
+            const debugInfo = document.getElementById('debugInfo');
+            
+            debugSection.style.display = 'block';
+            
+            const info = `
+📍 Текущий URL: ${window.location.href}
+🔗 Backend URL: ${BACKEND_URL}
+🌐 Протокол: ${window.location.protocol}
+📡 Хост: ${window.location.host}
+🚀 Путь: ${window.location.pathname}
+
+🔍 Настройки CORS:
+- Режим: ${window.location.protocol === 'https:' ? 'HTTPS (рекомендуется)' : 'HTTP (может быть проблем с камерой)'}
+- Домен: ${window.location.origin}
+- Бэкенд: ${BACKEND_URL}
+
+💡 Рекомендации:
+1. Убедитесь, что бэкенд запущен и доступен
+2. Проверьте настройки CORS на сервере
+3. Для камеры требуется HTTPS
+4. User ID должен быть: 1189539923
+
+🛠 Если есть CORS ошибки:
+- Проверьте Railway переменные окружения
+- Убедитесь, что CORS настроен на разрешение вашего домена
+- Проверьте логи сервера в Railway
+            `.trim();
+            
+            debugInfo.innerHTML = `<pre class="result info">${info}</pre>`;
+            
+            addResult('🐛 Debug информация показана', 'info');
         }
         
         // Автоматически обновляем время
