@@ -118,10 +118,40 @@
         .clock {
             font-size: 0.9rem;
             font-weight: 500;
-            background: rgba(255,255,255,0.15);
-            padding: 8px 16px;
+            color: var(--text-primary);
+        }
+        
+        /* Основные кнопки - только камера */
+        .main-actions {
+            margin: 25px 0;
+        }
+        
+        .main-btn {
+            background: var(--btn-camera);
+            border: none;
             border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.2);
+            padding: 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.3);
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: block;
+            width: 100%;
+        }
+        
+        .main-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .btn-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            display: block;
         }
         
         /* Статус карточки - компактные */
@@ -129,7 +159,8 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin: 25px 0;
+            margin-top: auto;
+            margin-bottom: 20px;
         }
         
         .status-card {
@@ -181,42 +212,8 @@
             overflow: hidden;
         }
         
-        /* Основные кнопки - только камера */
-        .main-actions {
-            margin: 25px 0;
-        }
-        
-        .main-btn {
-            background: var(--btn-camera);
-            border: none;
-            border-radius: 15px;
-            padding: 20px;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-align: center;
-            border: 2px solid rgba(255,255,255,0.3);
-            font-size: 1.1rem;
-            font-weight: 600;
-            display: block;
-            width: 100%;
-        }
-        
-        .main-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
-        
-        .btn-icon {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-            display: block;
-        }
-        
         /* Быстрые действия - компактные */
         .quick-actions {
-            margin-top: auto;
             margin-bottom: 20px;
         }
         
@@ -421,7 +418,7 @@
                 gap: 10px;
             }
             
-            .theme-toggle, .clock {
+            .theme-toggle {
                 width: 100%;
                 justify-content: center;
             }
@@ -473,7 +470,16 @@
             </a>
         </div>
 
-        <!-- Status Cards -->
+        <!-- Quick Actions - теперь в самом низу -->
+        <div class="quick-actions">
+            <div class="action-chips">
+                <button class="chip" onclick="showResults('test')">🔧 Тест</button>
+                <button class="chip" onclick="showResults('logs')">📊 Лог</button>
+                <button class="chip" onclick="refreshAll()">🔄 Обновить</button>
+            </div>
+        </div>
+
+        <!-- Status Cards - теперь внизу рядом с чипсами -->
         <div class="status-cards">
             <div class="status-card" id="systemStatusCard">
                 <div class="status-icon">🔄</div>
@@ -495,15 +501,6 @@
                     <div class="status-title">БОТ</div>
                     <div class="status-value" id="botStatus"></div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions - теперь в самом низу -->
-        <div class="quick-actions">
-            <div class="action-chips">
-                <button class="chip" onclick="showResults('test')">🔧 Тест</button>
-                <button class="chip" onclick="showResults('logs')">📊 Лог</button>
-                <button class="chip" onclick="refreshAll()">🔄 Обновить</button>
             </div>
         </div>
     </div>
