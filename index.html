@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Расширенная система тестирования с медиа-функциями</title>
+    <title>Система тестирования с переключением камер</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -121,6 +121,17 @@
             background: var(--warning);
         }
 
+        .btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn:disabled:hover {
+            background: var(--gray);
+            transform: none;
+        }
+
         .question {
             margin-bottom: 25px;
             padding-bottom: 20px;
@@ -146,26 +157,6 @@
             margin: 15px 0;
         }
 
-        .preview-container {
-            width: 100%;
-            max-width: 500px;
-            border: 2px dashed #dee2e6;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .preview-image {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 8px;
-        }
-
         .camera-preview {
             width: 100%;
             max-width: 500px;
@@ -173,6 +164,7 @@
             background: #000;
             border-radius: 8px;
             overflow: hidden;
+            position: relative;
         }
 
         .camera-preview video {
@@ -188,108 +180,15 @@
             display: none;
         }
 
-        .audio-visualizer {
-            width: 100%;
-            height: 100px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin: 15px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .audio-bar {
+        .camera-info {
             position: absolute;
-            bottom: 0;
-            width: 4px;
-            background: var(--primary);
-            margin: 0 1px;
-            border-radius: 2px 2px 0 0;
-        }
-
-        .audio-controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        .file-list {
-            width: 100%;
-            max-width: 500px;
-            margin-top: 15px;
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-
-        .file-icon {
-            font-size: 1.5rem;
-            color: var(--primary);
-        }
-
-        .file-info {
-            flex: 1;
-        }
-
-        .file-name {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .file-size {
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
             font-size: 0.8rem;
-            color: var(--gray);
-        }
-
-        .file-remove {
-            background: none;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .upload-area {
-            border: 2px dashed #dee2e6;
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-bottom: 15px;
-        }
-
-        .upload-area:hover {
-            border-color: var(--primary);
-            background: rgba(67, 97, 238, 0.05);
-        }
-
-        .upload-area i {
-            font-size: 3rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-
-        .upload-text {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-
-        .upload-hint {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        .hidden {
-            display: none;
         }
 
         .media-controls {
@@ -297,33 +196,25 @@
             gap: 10px;
             justify-content: center;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
 
-        .recording-indicator {
+        .camera-selector {
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: var(--danger);
-            font-weight: 600;
+            gap: 10px;
+            margin-top: 10px;
         }
 
-        .pulse {
-            width: 12px;
-            height: 12px;
-            background: var(--danger);
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
+        .camera-selector select {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            background: white;
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .audio-player {
-            width: 100%;
-            margin-top: 15px;
+        .hidden {
+            display: none;
         }
 
         .progress-container {
@@ -400,8 +291,8 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-camera"></i> Расширенная система тестирования</h1>
-            <p>С поддержкой работы с файлами, камерой и аудио</p>
+            <h1><i class="fas fa-camera"></i> Система тестирования с переключением камер</h1>
+            <p>Поддержка нескольких камер с выбором второй по умолчанию</p>
         </header>
 
         <div class="card">
@@ -421,127 +312,38 @@
         </div>
 
         <div class="card" id="questions-container">
-            <h3 class="card-title"><i class="fas fa-question-circle"></i> Вопросы с медиа-функциями</h3>
+            <h3 class="card-title"><i class="fas fa-question-circle"></i> Вопросы с использованием камеры</h3>
             
-            <!-- Вопрос 1: Загрузка файлов -->
+            <!-- Вопрос с камерой -->
             <div class="question" id="q1">
-                <div class="question-text">1. Загрузите файлы для проверки (изображения, документы):</div>
-                <div class="media-container">
-                    <div class="upload-area" id="uploadArea">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <div class="upload-text">Перетащите файлы сюда или нажмите для выбора</div>
-                        <div class="upload-hint">Поддерживаются: JPG, PNG, PDF, DOC, DOCX (макс. 10MB)</div>
-                    </div>
-                    <input type="file" id="fileInput" class="hidden" multiple accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
-                    <div class="file-list" id="fileList">
-                        <!-- Список загруженных файлов -->
-                    </div>
-                    <button class="btn" onclick="document.getElementById('fileInput').click()">
-                        <i class="fas fa-folder-open"></i> Выбрать файлы
-                    </button>
-                </div>
-            </div>
-
-            <!-- Вопрос 2: Использование камеры -->
-            <div class="question" id="q2">
-                <div class="question-text">2. Сделайте фотографию с помощью камеры:</div>
+                <div class="question-text">1. Сделайте фотографию с помощью камеры (вторая камера выбрана по умолчанию):</div>
                 <div class="media-container">
                     <div class="camera-preview" id="cameraPreview">
                         <video id="videoElement" autoplay playsinline></video>
+                        <div class="camera-info" id="cameraInfo">Камера не активирована</div>
                         <img id="capturedImage" class="captured-image">
                     </div>
+                    
+                    <div class="camera-selector">
+                        <label for="cameraSelect">Выберите камеру:</label>
+                        <select id="cameraSelect">
+                            <option value="">Загрузка камер...</option>
+                        </select>
+                    </div>
+                    
                     <div class="media-controls">
-                        <button class="btn btn-success" id="startCameraBtn" onclick="startCamera()">
+                        <button class="btn btn-success" id="startCameraBtn" onclick="initializeCamera()">
                             <i class="fas fa-camera"></i> Включить камеру
                         </button>
                         <button class="btn btn-warning" id="captureBtn" onclick="captureImage()" disabled>
                             <i class="fas fa-camera-retro"></i> Сделать снимок
                         </button>
+                        <button class="btn" id="switchCameraBtn" onclick="switchCamera()" disabled>
+                            <i class="fas fa-sync-alt"></i> Переключить камеру
+                        </button>
                         <button class="btn btn-danger" id="stopCameraBtn" onclick="stopCamera()" disabled>
                             <i class="fas fa-stop"></i> Выключить камеру
                         </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Вопрос 3: Запись аудио -->
-            <div class="question" id="q3">
-                <div class="question-text">3. Запишите аудио-ответ на вопрос:</div>
-                <div class="media-container">
-                    <div class="audio-visualizer" id="audioVisualizer">
-                        <!-- Визуализатор аудио -->
-                    </div>
-                    <div class="recording-indicator" id="recordingIndicator" style="display: none;">
-                        <div class="pulse"></div>
-                        <span>Идет запись...</span>
-                    </div>
-                    <div class="media-controls">
-                        <button class="btn btn-success" id="startRecordingBtn" onclick="startRecording()">
-                            <i class="fas fa-microphone"></i> Начать запись
-                        </button>
-                        <button class="btn btn-danger" id="stopRecordingBtn" onclick="stopRecording()" disabled>
-                            <i class="fas fa-stop"></i> Остановить запись
-                        </button>
-                    </div>
-                    <div class="audio-player" id="audioPlayer" style="display: none;">
-                        <audio id="audioElement" controls></audio>
-                        <button class="btn" onclick="deleteRecording()" style="margin-top: 10px;">
-                            <i class="fas fa-trash"></i> Удалить запись
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Вопрос 4: Захват экрана -->
-            <div class="question" id="q4">
-                <div class="question-text">4. Сделайте скриншот экрана:</div>
-                <div class="media-container">
-                    <div class="preview-container" id="screenshotPreview">
-                        <i class="fas fa-desktop" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i>
-                        <div class="upload-text">Скриншот появится здесь</div>
-                    </div>
-                    <div class="media-controls">
-                        <button class="btn btn-success" onclick="captureScreen()">
-                            <i class="fas fa-desktop"></i> Сделать скриншот
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Вопрос 5: Геолокация -->
-            <div class="question" id="q5">
-                <div class="question-text">5. Поделитесь вашим местоположением:</div>
-                <div class="media-container">
-                    <div class="preview-container" id="locationPreview">
-                        <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i>
-                        <div class="upload-text">Информация о местоположении появится здесь</div>
-                    </div>
-                    <div class="media-controls">
-                        <button class="btn btn-success" onclick="getLocation()">
-                            <i class="fas fa-location-arrow"></i> Получить местоположение
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Вопрос 6: Рисование -->
-            <div class="question" id="q6">
-                <div class="question-text">6. Нарисуйте схему или диаграмму:</div>
-                <div class="media-container">
-                    <canvas id="drawingCanvas" width="500" height="300" style="border: 1px solid #dee2e6; border-radius: 8px; cursor: crosshair;"></canvas>
-                    <div class="media-controls">
-                        <button class="btn" onclick="clearCanvas()">
-                            <i class="fas fa-eraser"></i> Очистить
-                        </button>
-                        <button class="btn btn-success" onclick="saveDrawing()">
-                            <i class="fas fa-save"></i> Сохранить рисунок
-                        </button>
-                    </div>
-                    <div class="color-picker" style="margin-top: 10px;">
-                        <label>Цвет: </label>
-                        <input type="color" id="drawingColor" value="#4361ee" onchange="changeDrawingColor(this.value)">
-                        <label style="margin-left: 15px;">Толщина: </label>
-                        <input type="range" id="drawingWidth" min="1" max="20" value="3" onchange="changeDrawingWidth(this.value)">
                     </div>
                 </div>
             </div>
@@ -559,25 +361,21 @@
     </div>
 
     <script>
-        // Глобальные переменные
-        let currentQuestion = 1;
-        let totalQuestions = 6;
-        let answeredQuestions = 0;
+        // Глобальные переменные для работы с камерой
         let mediaStream = null;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let audioContext = null;
-        let analyser = null;
-        let canvasContext = null;
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
+        let cameras = [];
+        let currentCameraIndex = -1;
+        let currentCameraId = null;
+        
+        // Переменные для отслеживания прогресса
+        let currentQuestion = 1;
+        let totalQuestions = 1;
+        let answeredQuestions = 0;
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             initializeQuestionNavigation();
-            initializeFileUpload();
-            initializeDrawingCanvas();
+            loadCameras();
         });
 
         // Инициализация навигации по вопросам
@@ -620,148 +418,197 @@
             }
         }
 
-        // Инициализация загрузки файлов
-        function initializeFileUpload() {
-            const uploadArea = document.getElementById('uploadArea');
-            const fileInput = document.getElementById('fileInput');
-            
-            // Обработка клика по области загрузки
-            uploadArea.addEventListener('click', () => {
-                fileInput.click();
-            });
-            
-            // Обработка выбора файлов
-            fileInput.addEventListener('change', handleFileSelect);
-            
-            // Обработка перетаскивания файлов
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#4361ee';
-                uploadArea.style.background = 'rgba(67, 97, 238, 0.05)';
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.style.borderColor = '#dee2e6';
-                uploadArea.style.background = 'white';
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#dee2e6';
-                uploadArea.style.background = 'white';
+        // Загрузка списка доступных камер
+        async function loadCameras() {
+            try {
+                // Получаем все устройства
+                const devices = await navigator.mediaDevices.enumerateDevices();
                 
-                if (e.dataTransfer.files.length) {
-                    handleFiles(e.dataTransfer.files);
+                // Фильтруем только видеоустройства (камеры)
+                cameras = devices.filter(device => device.kind === 'videoinput');
+                
+                // Обновляем выпадающий список камер
+                const cameraSelect = document.getElementById('cameraSelect');
+                cameraSelect.innerHTML = '';
+                
+                if (cameras.length === 0) {
+                    cameraSelect.innerHTML = '<option value="">Камеры не найдены</option>';
+                    return;
                 }
-            });
+                
+                // Добавляем камеры в выпадающий список
+                cameras.forEach((camera, index) => {
+                    const option = document.createElement('option');
+                    option.value = camera.deviceId;
+                    option.textContent = camera.label || `Камера ${index + 1}`;
+                    cameraSelect.appendChild(option);
+                });
+                
+                // По умолчанию выбираем вторую камеру, если она есть
+                if (cameras.length > 1) {
+                    cameraSelect.selectedIndex = 1;
+                    currentCameraIndex = 1;
+                    currentCameraId = cameras[1].deviceId;
+                } else if (cameras.length === 1) {
+                    currentCameraIndex = 0;
+                    currentCameraId = cameras[0].deviceId;
+                }
+                
+                console.log(`Найдено камер: ${cameras.length}`);
+            } catch (error) {
+                console.error('Ошибка при загрузке камер:', error);
+                document.getElementById('cameraSelect').innerHTML = '<option value="">Ошибка загрузки камер</option>';
+            }
         }
 
-        // Обработка выбора файлов через input
-        function handleFileSelect(e) {
-            handleFiles(e.target.files);
-        }
-
-        // Обработка файлов
-        function handleFiles(files) {
-            const fileList = document.getElementById('fileList');
-            
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                
-                // Проверка размера файла (макс. 10MB)
-                if (file.size > 10 * 1024 * 1024) {
-                    alert(`Файл "${file.name}" слишком большой. Максимальный размер: 10MB.`);
-                    continue;
-                }
-                
-                // Создание элемента файла
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                
-                // Определение иконки по типу файла
-                let fileIcon = 'fa-file';
-                if (file.type.startsWith('image/')) {
-                    fileIcon = 'fa-file-image';
-                } else if (file.type === 'application/pdf') {
-                    fileIcon = 'fa-file-pdf';
-                } else if (file.type.includes('document') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
-                    fileIcon = 'fa-file-word';
-                }
-                
-                // Форматирование размера файла
-                const fileSize = formatFileSize(file.size);
-                
-                fileItem.innerHTML = `
-                    <i class="fas ${fileIcon} file-icon"></i>
-                    <div class="file-info">
-                        <div class="file-name">${file.name}</div>
-                        <div class="file-size">${fileSize}</div>
-                    </div>
-                    <button class="file-remove" onclick="removeFile(this)"><i class="fas fa-times"></i></button>
-                `;
-                
-                fileList.appendChild(fileItem);
-                
-                // Если это изображение, показываем превью
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.className = 'preview-image';
-                        img.style.maxWidth = '100px';
-                        img.style.maxHeight = '100px';
-                        fileItem.querySelector('.file-info').appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-                }
+        // Инициализация камеры
+        async function initializeCamera() {
+            // Если камера уже активна, ничего не делаем
+            if (mediaStream) {
+                return;
             }
             
-            // Обновляем прогресс
-            updateProgress();
-        }
-
-        // Удаление файла
-        function removeFile(button) {
-            const fileItem = button.parentElement;
-            fileItem.remove();
-            updateProgress();
-        }
-
-        // Форматирование размера файла
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Работа с камерой
-        async function startCamera() {
             try {
-                // Запрос доступа к камере
-                mediaStream = await navigator.mediaDevices.getUserMedia({ 
+                // Получаем выбранную камеру
+                const cameraSelect = document.getElementById('cameraSelect');
+                const selectedCameraId = cameraSelect.value;
+                
+                if (!selectedCameraId) {
+                    alert('Пожалуйста, выберите камеру');
+                    return;
+                }
+                
+                // Запрос доступа к камере с выбранным deviceId
+                const constraints = {
                     video: { 
+                        deviceId: { exact: selectedCameraId },
                         width: { ideal: 1280 },
                         height: { ideal: 720 }
                     } 
-                });
+                };
+                
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 
                 const videoElement = document.getElementById('videoElement');
                 videoElement.srcObject = mediaStream;
                 
+                // Обновляем информацию о камере
+                const selectedCamera = cameras.find(cam => cam.deviceId === selectedCameraId);
+                document.getElementById('cameraInfo').textContent = selectedCamera?.label || 'Камера активирована';
+                
                 // Активируем кнопки
                 document.getElementById('startCameraBtn').disabled = true;
                 document.getElementById('captureBtn').disabled = false;
+                document.getElementById('switchCameraBtn').disabled = false;
                 document.getElementById('stopCameraBtn').disabled = false;
                 
+                // Обновляем прогресс
                 updateProgress();
+                
             } catch (error) {
                 console.error('Ошибка доступа к камере:', error);
-                alert('Не удалось получить доступ к камере. Проверьте разрешения.');
+                
+                // Пробуем использовать общие ограничения, если конкретная камера не доступна
+                if (error.name === 'OverconstrainedError' || error.name === 'ConstraintNotSatisfiedError') {
+                    try {
+                        alert('Выбранная камера недоступна. Пробуем использовать другую камеру...');
+                        await startWithDefaultCamera();
+                    } catch (fallbackError) {
+                        alert('Не удалось получить доступ к камере. Проверьте разрешения.');
+                    }
+                } else {
+                    alert('Не удалось получить доступ к камере. Проверьте разрешения.');
+                }
+            }
+        }
+
+        // Запуск камеры с ограничениями по умолчанию
+        async function startWithDefaultCamera() {
+            try {
+                const constraints = {
+                    video: { 
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                };
+                
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                const videoElement = document.getElementById('videoElement');
+                videoElement.srcObject = mediaStream;
+                
+                // Обновляем информацию о камере
+                document.getElementById('cameraInfo').textContent = 'Камера по умолчанию';
+                
+                // Активируем кнопки
+                document.getElementById('startCameraBtn').disabled = true;
+                document.getElementById('captureBtn').disabled = false;
+                document.getElementById('switchCameraBtn').disabled = false;
+                document.getElementById('stopCameraBtn').disabled = false;
+                
+                // Обновляем прогресс
+                updateProgress();
+                
+            } catch (error) {
+                console.error('Ошибка доступа к камере по умолчанию:', error);
+                throw error;
+            }
+        }
+
+        // Переключение между камерами
+        async function switchCamera() {
+            if (cameras.length <= 1) {
+                alert('Доступна только одна камера');
+                return;
+            }
+            
+            // Останавливаем текущий поток
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+            
+            // Выбираем следующую камеру
+            currentCameraIndex = (currentCameraIndex + 1) % cameras.length;
+            currentCameraId = cameras[currentCameraIndex].deviceId;
+            
+            // Обновляем выпадающий список
+            document.getElementById('cameraSelect').selectedIndex = currentCameraIndex;
+            
+            // Запускаем новую камеру
+            await initializeCameraWithId(currentCameraId);
+        }
+
+        // Инициализация камеры по ID
+        async function initializeCameraWithId(deviceId) {
+            try {
+                const constraints = {
+                    video: { 
+                        deviceId: { exact: deviceId },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                };
+                
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                const videoElement = document.getElementById('videoElement');
+                videoElement.srcObject = mediaStream;
+                
+                // Обновляем информацию о камере
+                const selectedCamera = cameras.find(cam => cam.deviceId === deviceId);
+                document.getElementById('cameraInfo').textContent = selectedCamera?.label || `Камера ${currentCameraIndex + 1}`;
+                
+                console.log(`Переключено на камеру: ${selectedCamera?.label || deviceId}`);
+                
+            } catch (error) {
+                console.error('Ошибка при переключении камеры:', error);
+                alert('Не удалось переключиться на выбранную камеру');
+                
+                // Пробуем следующую камеру
+                if (cameras.length > 1) {
+                    setTimeout(switchCamera, 500);
+                }
             }
         }
 
@@ -783,6 +630,9 @@
             capturedImage.style.display = 'block';
             videoElement.style.display = 'none';
             
+            // Обновляем информацию
+            document.getElementById('cameraInfo').textContent = 'Снимок сделан';
+            
             updateProgress();
         }
 
@@ -799,327 +649,13 @@
             // Деактивируем кнопки
             document.getElementById('startCameraBtn').disabled = false;
             document.getElementById('captureBtn').disabled = true;
+            document.getElementById('switchCameraBtn').disabled = true;
             document.getElementById('stopCameraBtn').disabled = true;
             
             // Сбрасываем отображение
             videoElement.style.display = 'block';
             document.getElementById('capturedImage').style.display = 'none';
-        }
-
-        // Запись аудио
-        async function startRecording() {
-            try {
-                // Запрос доступа к микрофону
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                
-                // Создаем MediaRecorder
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                
-                // Обработка данных записи
-                mediaRecorder.ondataavailable = (event) => {
-                    audioChunks.push(event.data);
-                };
-                
-                // Обработка завершения записи
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    
-                    const audioElement = document.getElementById('audioElement');
-                    audioElement.src = audioUrl;
-                    
-                    document.getElementById('audioPlayer').style.display = 'block';
-                    document.getElementById('recordingIndicator').style.display = 'none';
-                    
-                    updateProgress();
-                };
-                
-                // Запуск записи
-                mediaRecorder.start();
-                
-                // Визуализация аудио
-                setupAudioVisualizer(stream);
-                
-                // Обновляем UI
-                document.getElementById('startRecordingBtn').disabled = true;
-                document.getElementById('stopRecordingBtn').disabled = false;
-                document.getElementById('recordingIndicator').style.display = 'flex';
-                
-            } catch (error) {
-                console.error('Ошибка доступа к микрофону:', error);
-                alert('Не удалось получить доступ к микрофону. Проверьте разрешения.');
-            }
-        }
-
-        // Остановка записи аудио
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                
-                // Останавливаем все треки
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
-                
-                // Обновляем UI
-                document.getElementById('startRecordingBtn').disabled = false;
-                document.getElementById('stopRecordingBtn').disabled = true;
-            }
-        }
-
-        // Удаление записи
-        function deleteRecording() {
-            document.getElementById('audioElement').src = '';
-            document.getElementById('audioPlayer').style.display = 'none';
-            updateProgress();
-        }
-
-        // Настройка визуализатора аудио
-        function setupAudioVisualizer(stream) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioContext.createAnalyser();
-            const source = audioContext.createMediaStreamSource(stream);
-            
-            source.connect(analyser);
-            analyser.fftSize = 256;
-            
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            
-            const visualizer = document.getElementById('audioVisualizer');
-            visualizer.innerHTML = '';
-            
-            // Создаем бары для визуализации
-            for (let i = 0; i < bufferLength; i++) {
-                const bar = document.createElement('div');
-                bar.className = 'audio-bar';
-                bar.style.left = `${(i / bufferLength) * 100}%`;
-                bar.style.height = '0px';
-                visualizer.appendChild(bar);
-            }
-            
-            // Функция обновления визуализации
-            function updateVisualization() {
-                if (!analyser) return;
-                
-                analyser.getByteFrequencyData(dataArray);
-                
-                const bars = visualizer.querySelectorAll('.audio-bar');
-                for (let i = 0; i < bars.length; i++) {
-                    const value = dataArray[i];
-                    const height = (value / 255) * 100;
-                    bars[i].style.height = `${height}%`;
-                }
-                
-                requestAnimationFrame(updateVisualization);
-            }
-            
-            updateVisualization();
-        }
-
-        // Захват экрана
-        async function captureScreen() {
-            try {
-                // Запрос на захват экрана
-                const stream = await navigator.mediaDevices.getDisplayMedia({
-                    video: { cursor: "always" },
-                    audio: false
-                });
-                
-                const video = document.createElement('video');
-                video.srcObject = stream;
-                video.onloadedmetadata = () => {
-                    video.play();
-                    
-                    // Создаем canvas для захвата
-                    const canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    
-                    const context = canvas.getContext('2d');
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    
-                    // Отображаем скриншот
-                    const screenshotPreview = document.getElementById('screenshotPreview');
-                    screenshotPreview.innerHTML = '';
-                    
-                    const img = document.createElement('img');
-                    img.src = canvas.toDataURL('image/png');
-                    img.className = 'preview-image';
-                    screenshotPreview.appendChild(img);
-                    
-                    // Останавливаем поток
-                    stream.getTracks().forEach(track => track.stop());
-                    
-                    updateProgress();
-                };
-            } catch (error) {
-                console.error('Ошибка захвата экрана:', error);
-                alert('Не удалось сделать скриншот. Возможно, вы отменили выбор области.');
-            }
-        }
-
-        // Получение геолокации
-        function getLocation() {
-            if (!navigator.geolocation) {
-                alert('Геолокация не поддерживается вашим браузером');
-                return;
-            }
-            
-            const locationPreview = document.getElementById('locationPreview');
-            locationPreview.innerHTML = '<div class="upload-text">Определение местоположения...</div>';
-            
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
-                    
-                    locationPreview.innerHTML = `
-                        <div class="upload-text">Ваше местоположение:</div>
-                        <div>Широта: ${latitude.toFixed(6)}</div>
-                        <div>Долгота: ${longitude.toFixed(6)}</div>
-                        <div>Точность: ±${position.coords.accuracy} метров</div>
-                    `;
-                    
-                    updateProgress();
-                },
-                (error) => {
-                    console.error('Ошибка геолокации:', error);
-                    let errorMessage = 'Не удалось определить местоположение';
-                    
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            errorMessage = 'Доступ к геолокации запрещен';
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            errorMessage = 'Информация о местоположении недоступна';
-                            break;
-                        case error.TIMEOUT:
-                            errorMessage = 'Время ожидания определения местоположения истекло';
-                            break;
-                    }
-                    
-                    locationPreview.innerHTML = `<div class="upload-text">${errorMessage}</div>`;
-                }
-            );
-        }
-
-        // Инициализация холста для рисования
-        function initializeDrawingCanvas() {
-            const canvas = document.getElementById('drawingCanvas');
-            canvasContext = canvas.getContext('2d');
-            
-            // Настройка стилей рисования
-            canvasContext.lineJoin = 'round';
-            canvasContext.lineCap = 'round';
-            canvasContext.lineWidth = document.getElementById('drawingWidth').value;
-            canvasContext.strokeStyle = document.getElementById('drawingColor').value;
-            
-            // Обработчики событий мыши
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
-            
-            // Обработчики событий касания (для мобильных устройств)
-            canvas.addEventListener('touchstart', handleTouchStart);
-            canvas.addEventListener('touchmove', handleTouchMove);
-            canvas.addEventListener('touchend', stopDrawing);
-        }
-
-        // Начало рисования
-        function startDrawing(e) {
-            isDrawing = true;
-            [lastX, lastY] = getEventCoordinates(e);
-        }
-
-        // Рисование
-        function draw(e) {
-            if (!isDrawing) return;
-            e.preventDefault();
-            
-            const [x, y] = getEventCoordinates(e);
-            
-            canvasContext.beginPath();
-            canvasContext.moveTo(lastX, lastY);
-            canvasContext.lineTo(x, y);
-            canvasContext.stroke();
-            
-            [lastX, lastY] = [x, y];
-        }
-
-        // Остановка рисования
-        function stopDrawing() {
-            isDrawing = false;
-        }
-
-        // Обработка касаний
-        function handleTouchStart(e) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const mouseEvent = new MouseEvent('mousedown', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            startDrawing(mouseEvent);
-        }
-
-        function handleTouchMove(e) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const mouseEvent = new MouseEvent('mousemove', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            draw(mouseEvent);
-        }
-
-        // Получение координат события
-        function getEventCoordinates(e) {
-            const canvas = document.getElementById('drawingCanvas');
-            const rect = canvas.getBoundingClientRect();
-            
-            let x, y;
-            
-            if (e.type.includes('touch')) {
-                x = e.touches[0].clientX - rect.left;
-                y = e.touches[0].clientY - rect.top;
-            } else {
-                x = e.clientX - rect.left;
-                y = e.clientY - rect.top;
-            }
-            
-            return [x, y];
-        }
-
-        // Очистка холста
-        function clearCanvas() {
-            const canvas = document.getElementById('drawingCanvas');
-            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        // Сохранение рисунка
-        function saveDrawing() {
-            const canvas = document.getElementById('drawingCanvas');
-            const dataURL = canvas.toDataURL('image/png');
-            
-            // В реальном приложении здесь можно отправить изображение на сервер
-            // или сохранить его локально
-            const link = document.createElement('a');
-            link.download = 'рисунок.png';
-            link.href = dataURL;
-            link.click();
-            
-            updateProgress();
-        }
-
-        // Изменение цвета рисования
-        function changeDrawingColor(color) {
-            canvasContext.strokeStyle = color;
-        }
-
-        // Изменение толщины линии
-        function changeDrawingWidth(width) {
-            canvasContext.lineWidth = width;
+            document.getElementById('cameraInfo').textContent = 'Камера не активирована';
         }
 
         // Обновление прогресса
@@ -1146,11 +682,8 @@
         function finishTest() {
             alert('Тест завершен! В реальном приложении здесь были бы отправлены все данные на сервер.');
             
-            // Останавливаем камеру и запись, если они активны
+            // Останавливаем камеру
             stopCamera();
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                stopRecording();
-            }
         }
 
         // Сброс теста
@@ -1159,33 +692,11 @@
                 // Сброс всех данных
                 answeredQuestions = 0;
                 
-                // Очистка файлов
-                document.getElementById('fileList').innerHTML = '';
-                
                 // Остановка камеры
                 stopCamera();
                 
-                // Остановка записи
-                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                    stopRecording();
-                }
-                
-                // Очистка холста
-                clearCanvas();
-                
-                // Сброс других элементов
-                document.getElementById('screenshotPreview').innerHTML = `
-                    <i class="fas fa-desktop" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i>
-                    <div class="upload-text">Скриншот появится здесь</div>
-                `;
-                
-                document.getElementById('locationPreview').innerHTML = `
-                    <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i>
-                    <div class="upload-text">Информация о местоположении появится здесь</div>
-                `;
-                
-                document.getElementById('audioPlayer').style.display = 'none';
-                document.getElementById('recordingIndicator').style.display = 'none';
+                // Перезагрузка списка камер
+                loadCameras();
                 
                 // Обновление прогресса
                 updateProgress();
@@ -1194,6 +705,21 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
+
+        // Обработчик изменения выбора камеры в выпадающем списке
+        document.getElementById('cameraSelect').addEventListener('change', function() {
+            const selectedIndex = this.selectedIndex;
+            if (selectedIndex >= 0 && selectedIndex < cameras.length) {
+                currentCameraIndex = selectedIndex;
+                currentCameraId = cameras[selectedIndex].deviceId;
+                
+                // Если камера уже активна, переключаемся на выбранную
+                if (mediaStream) {
+                    stopCamera();
+                    setTimeout(() => initializeCamera(), 300);
+                }
+            }
+        });
     </script>
 </body>
 </html>
