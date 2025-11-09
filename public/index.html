@@ -17,6 +17,8 @@
             color: #e1e1e1;
             padding: 20px;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         
         .container {
@@ -26,6 +28,9 @@
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
         
         .header {
@@ -102,10 +107,35 @@
             margin: 20px 0;
         }
         
+        .camera-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #50a8eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: auto;
+            transition: all 0.2s ease;
+        }
+        
+        .camera-button:hover {
+            background-color: #3d8fc9;
+            transform: translateY(-2px);
+        }
+        
+        .chips-container {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+        
         .actions {
             display: flex;
             gap: 15px;
-            margin-top: 20px;
+            justify-content: center;
         }
         
         .btn {
@@ -134,26 +164,6 @@
         
         .btn:hover {
             opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
-        .camera-button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background-color: #50a8eb;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.2s ease;
-        }
-        
-        .camera-button:hover {
-            background-color: #3d8fc9;
             transform: translateY(-2px);
         }
     </style>
@@ -189,15 +199,16 @@
             </div>
         </div>
         
-        <div class="divider"></div>
-        
-        <div class="actions">
-            <button class="btn btn-test">Тест</button>
-            <button class="btn btn-log">Лог</button>
-            <button class="btn btn-refresh">Обновить</button>
-        </div>
-        
         <button class="camera-button">Открыть камеру</button>
+        
+        <div class="chips-container">
+            <div class="divider"></div>
+            <div class="actions">
+                <button class="btn btn-test">Тест</button>
+                <button class="btn btn-log">Лог</button>
+                <button class="btn btn-refresh">Обновить</button>
+            </div>
+        </div>
     </div>
 
     <script>
