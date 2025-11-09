@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test</title>
+</head>
+<body>
+    <h1>CORS Test for Telegram Camera Bot</h1>
+    <button onclick="testCORS()">Test CORS</button>
+    <div id="result"></div>
+
+    <script>
+        async function testCORS() {
+            const urls = [
+                'https://telegram-camera-bot-production.up.railway.app/',
+                'https://telegram-camera-bot-production.up.railway.app/api/bot-status',
+                'https://telegram-camera-bot-production.up.railway.app/api/stats',
+                'https://telegram-camera-bot-production.up.railway.app/api/logs'
+            ];
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+
+            for (const url of urls) {
+                try {
+                    const response = await fetch(url, { mode: 'cors' });
+                    const data = await response.json();
+                    resultDiv.innerHTML += `<div style="color: green;">✅ ${url} - SUCCESS</div>`;
+                } catch (error) {
+                    resultDiv.innerHTML += `<div style="color: red;">❌ ${url} - ERROR: ${error.message}</div>`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
