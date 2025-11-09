@@ -155,6 +155,21 @@
             font-weight: bold;
             margin: 10px 0;
         }
+        
+        .server-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: left;
+        }
+        
+        .server-info code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
     </style>
 </head>
 <body>
@@ -178,6 +193,7 @@
                 <a href="camera-app.html" class="btn">📸 Открыть камеру</a>
                 <button class="btn btn-secondary" onclick="loadLogs()">📊 Показать логи</button>
                 <button class="btn btn-secondary" onclick="loadStats()">📈 Статистика</button>
+                <a href="test-cors.html" class="btn btn-secondary">🔧 Тест CORS</a>
             </div>
         </div>
         
@@ -211,6 +227,13 @@
             <p><strong>Время ответа:</strong> <span id="responseTime">-</span></p>
         </div>
 
+        <div class="server-info">
+            <h4>🌐 Информация о сервере</h4>
+            <p><strong>Backend URL:</strong> <code>https://telegram-camera-bot-production.up.railway.app</code></p>
+            <p><strong>Frontend URL:</strong> <code id="frontendUrl">Загрузка...</code></p>
+            <p><strong>CORS Status:</strong> <span id="corsStatus">Проверка...</span></p>
+        </div>
+
         <div class="card" id="statsSection" style="display: none;">
             <h3>📈 Статистика системы</h3>
             <div class="stats-grid" id="statsGrid">
@@ -230,28 +253,48 @@
     </div>
 
     <script>
+        const BACKEND_URL = 'https://telegram-camera-bot-production.up.railway.app';
         let monitoringInterval;
 
+        // Показываем текущий URL фронтенда
+        document.getElementById('frontendUrl').textContent = window.location.origin;
+
         async function checkSystemStatus() {
-            const backendUrl = window.location.origin;
             const startTime = Date.now();
             
             try {
                 // Check backend
-                const backendResponse = await fetch(backendUrl);
+                const backendResponse = await fetch(BACKEND_URL, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
                 if (backendResponse.ok) {
+                    const data = await backendResponse.json();
                     document.getElementById('backendStatus').innerHTML = '✅ Активен';
                     document.getElementById('backendStatus').className = 'success';
+                    document.getElementById('corsStatus').innerHTML = '✅ Включен';
+                    document.getElementById('corsStatus').className = 'success';
                 } else {
                     throw new Error('Backend not responding properly');
                 }
                 
                 // Check bot status
-                const botResponse = await fetch(backendUrl + '/api/bot-status');
+                const botResponse = await fetch(BACKEND_URL + '/api/bot-status', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
                 const botData = await botResponse.json();
                 
                 if (botData.status === 'ACTIVE') {
-                    document.getElementById('botStatus').innerHTML = '✅ Активен (' + botData.bot.first_name + ')';
+                    document.getElementById('botStatus').innerHTML = `✅ Активен (${botData.bot.first_name})`;
                     document.getElementById('botStatus').className = 'success';
                 } else {
                     document.getElementById('botStatus').innerHTML = '⚠️ ' + (botData.error || 'Проблема с ботом');
@@ -266,6 +309,7 @@
                 document.getElementById('systemStatus').className = 'success';
                 
             } catch (error) {
+                console.error('Status check error:', error);
                 document.getElementById('backendStatus').innerHTML = '❌ Не доступен';
                 document.getElementById('backendStatus').className = 'error';
                 document.getElementById('botStatus').innerHTML = '❌ Не доступен';
@@ -274,7 +318,12 @@
                 document.getElementById('systemStatus').className = 'error';
                 document.getElementById('responseTime').textContent = 'Ошибка';
                 document.getElementById('responseTime').className = 'error';
-                console.error('Status check error:', error);
+                document.getElementById('corsStatus').innerHTML = '❌ Ошибка';
+                document.getElementById('corsStatus').className = 'error';
+                
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    document.getElementById('systemStatus').innerHTML = '❌ CORS ошибка: Проверьте настройки сервера';
+                }
             }
         }
 
@@ -283,7 +332,18 @@
                 document.getElementById('logsSection').style.display = 'block';
                 document.getElementById('logsContainer').innerHTML = '<div class="log-entry">Загрузка логов...</div>';
                 
-                const response = await fetch(window.location.origin + '/api/logs');
+                const response = await fetch(BACKEND_URL + '/api/logs', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.status === 'SUCCESS') {
@@ -305,7 +365,8 @@
                     document.getElementById('logsContainer').innerHTML = `<div class="log-entry log-error">Ошибка: ${data.message}</div>`;
                 }
             } catch (error) {
-                document.getElementById('logsContainer').innerHTML = `<div class="log-entry log-error">Ошибка загрузки: ${error.message}</div>`;
+                console.error('Load logs error:', error);
+                document.getElementById('logsContainer').innerHTML = `<div class="log-entry log-error">❌ Ошибка загрузки: ${error.message}</div>`;
             }
         }
 
@@ -314,7 +375,18 @@
                 document.getElementById('statsSection').style.display = 'block';
                 document.getElementById('statsGrid').innerHTML = '<div class="stat-card">Загрузка статистики...</div>';
                 
-                const response = await fetch(window.location.origin + '/api/stats');
+                const response = await fetch(BACKEND_URL + '/api/stats', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
                 
                 const statsHTML = `
@@ -334,11 +406,20 @@
                         <div>🤖 Bot</div>
                         <div class="stat-value">${data.environment.botTokenSet ? '✅' : '❌'}</div>
                     </div>
+                    <div class="stat-card">
+                        <div>🌐 CORS</div>
+                        <div class="stat-value">${data.cors ? '✅' : '❌'}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>📡 Origin</div>
+                        <div class="stat-value" style="font-size: 0.7rem;">${data.cors?.origin || 'unknown'}</div>
+                    </div>
                 `;
                 
                 document.getElementById('statsGrid').innerHTML = statsHTML;
             } catch (error) {
-                document.getElementById('statsGrid').innerHTML = `<div class="stat-card">Ошибка: ${error.message}</div>`;
+                console.error('Load stats error:', error);
+                document.getElementById('statsGrid').innerHTML = `<div class="stat-card">❌ Ошибка: ${error.message}</div>`;
             }
         }
 
