@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Camera App - Главная</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .header {
+            padding: 40px 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #0088cc;
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            background: #006699;
+            transform: translateY(-2px);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📷 Telegram Camera App</h1>
+            <p class="subtitle">Снимайте фото и отправляйте прямо в Telegram бота</p>
+        </div>
+        
+        <div class="card">
+            <h2>🚀 Приложение готово к использованию!</h2>
+            <p>Откройте камеру и начните отправлять фото вашему боту</p>
+            
+            <div style="margin: 30px 0;">
+                <a href="camera-app.html" class="btn">📸 Открыть камеру</a>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <h3>Мобильная камера</h3>
+                <p>Используйте камеру вашего устройства</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3>Мгновенная отправка</h3>
+                <p>Фото сразу попадает в Telegram</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <h3>Безопасно</h3>
+                <p>Работает через официальный Telegram Web App</p>
+            </div>
+        </div>
+        
+        <div class="status">
+            <p><strong>Статус:</strong> <span id="status">Проверка...</span></p>
+            <p><strong>Frontend:</strong> GitHub Pages ✅</p>
+            <p><strong>Backend:</strong> <span id="backendStatus">Не настроен</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Проверка статуса бэкенда
+        async function checkBackend() {
+            const backendUrl = 'https://your-backend-url.railway.app'; // ЗАМЕНИТЕ позже
+            
+            try {
+                const response = await fetch(backendUrl);
+                if (response.ok) {
+                    document.getElementById('backendStatus').innerHTML = '✅ Настроен';
+                    document.getElementById('backendStatus').style.color = '#4ade80';
+                } else {
+                    document.getElementById('backendStatus').innerHTML = '❌ Не доступен';
+                    document.getElementById('backendStatus').style.color = '#f87171';
+                }
+            } catch (error) {
+                document.getElementById('backendStatus').innerHTML = '⚠️ Не настроен';
+                document.getElementById('backendStatus').style.color = '#fbbf24';
+            }
+            
+            document.getElementById('status').innerHTML = '✅ Готов к работе';
+            document.getElementById('status').style.color = '#4ade80';
+        }
+        
+        // Запускаем проверку при загрузке
+        checkBackend();
+    </script>
+</body>
+</html>
