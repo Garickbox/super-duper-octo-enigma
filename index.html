@@ -3,1042 +3,1197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ЛР №3 — Отношение теплоёмкостей (тест)</title>
+    <title>Расширенная система тестирования с медиа-функциями</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         body {
-            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
             padding: 20px;
-            background-color: #f5f5f5;
-            color: #333;
         }
+
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
-            background-color: white;
+        }
+
+        header {
+            background: white;
+            border-radius: var(--border-radius);
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1, h2, h3 {
-            color: #2c3e50;
-        }
-        h1 {
-            text-align: center;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-        }
-        .section {
             margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            box-shadow: var(--box-shadow);
+            text-align: center;
         }
-        .section-title {
-            background-color: #3498db;
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            font-size: 1.2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
             color: white;
-            padding: 10px;
-            margin: -15px -15px 15px -15px;
-            border-radius: 5px 5px 0 0;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
         }
-        table {
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-block {
+            display: flex;
             width: 100%;
-            border-collapse: collapse;
+            justify-content: center;
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .question:last-child {
+            border-bottom: none;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .media-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
             margin: 15px 0;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        select {
+
+        .preview-container {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 5px;
-            transition: background-color 0.3s;
-        }
-        .btn:hover { background-color: #2980b9; }
-        .btn-reset { background-color: #e74c3c; }
-        .btn-reset:hover { background-color: #c0392b; }
-        .btn-telegram { background-color: #0088cc; }
-        .btn-telegram:hover { background-color: #0077b3; }
-        .btn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        .btn:disabled:hover {
-            background-color: #cccccc;
-        }
-        .result { padding: 10px; background-color: #f9f9f9; border-radius: 4px; margin-top: 10px; }
-        .score { font-weight: bold; font-size: 18px; }
-        .navigation { display: flex; justify-content: space-between; margin-top: 20px; }
-        .tab { display: none; }
-        .tab.active { display: block; }
-        .tab-buttons {
+            max-width: 500px;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            min-height: 200px;
             display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        .tab-button {
-            padding: 10px 20px;
-            background-color: #f1f1f1;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px 5px 0 0;
-            margin-right: 5px;
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
         }
-        .tab-button.active {
-            background-color: #3498db;
-            color: white;
+
+        .camera-preview {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
         }
-        .hint {
+
+        .camera-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .captured-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
             display: none;
-            margin-top: 5px;
-            padding: 8px;
-            background-color: #e8f4fc;
-            border-left: 3px solid #3498db;
-            font-size: 0.9em;
         }
-        .hint.show { display: block; }
-        .hint-btn {
+
+        .audio-visualizer {
+            width: 100%;
+            height: 100px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .audio-bar {
+            position: absolute;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary);
+            margin: 0 1px;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .audio-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .file-list {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .file-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .file-size {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .file-remove {
             background: none;
             border: none;
-            color: #3498db;
+            color: var(--danger);
             cursor: pointer;
-            font-weight: bold;
-            margin-left: 5px;
+            font-size: 1.2rem;
         }
-        .hint-btn.hidden {
+
+        .upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 15px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .hidden {
             display: none;
         }
-        .mode-toggle {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #fafafa;
-            border-radius: 5px;
+
+        .media-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
         }
-        code {
-            background: #f1f3f5;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-family: monospace;
+
+        .recording-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--danger);
+            font-weight: 600;
         }
-        
-        /* Новые стили для улучшений */
+
+        .pulse {
+            width: 12px;
+            height: 12px;
+            background: var(--danger);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 15px;
+        }
+
         .progress-container {
-            margin: 15px 0;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
+            margin: 20px 0;
         }
+
         .progress-bar {
             height: 10px;
-            background-color: #e9ecef;
+            background: #e9ecef;
             border-radius: 5px;
             overflow: hidden;
-            margin: 5px 0;
+            margin-bottom: 5px;
         }
+
         .progress-fill {
             height: 100%;
-            background-color: #3498db;
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            border-radius: 5px;
+            transition: width 0.5s ease;
         }
+
         .progress-text {
-            text-align: center;
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-        .timer {
-            padding: 8px 12px;
-            background-color: #e8f4fc;
-            border-radius: 4px;
-            display: inline-block;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        .question-nav {
             display: flex;
             justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .question-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
             margin: 15px 0;
         }
+
         .question-number {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            line-height: 30px;
-            text-align: center;
-            background-color: #f1f1f1;
-            border-radius: 50%;
-            margin-right: 5px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f3f5;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
+            transition: var(--transition);
         }
+
+        .question-number:hover {
+            background: #e9ecef;
+        }
+
         .question-number.active {
-            background-color: #3498db;
+            background: var(--primary);
             color: white;
         }
+
         .question-number.answered {
-            background-color: #2ecc71;
+            background: var(--success);
             color: white;
         }
-        
-        /* Стили для настроек Telegram */
-        .telegram-settings {
-            margin: 15px 0;
-            padding: 15px;
-            background-color: #f0f8ff;
-            border-radius: 5px;
-            border-left: 4px solid #0088cc;
-        }
-        .telegram-settings h4 {
-            margin-top: 0;
-            color: #0088cc;
-        }
-        .telegram-settings input {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        
-        /* Адаптивность для мобильных */
+
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
+            .card {
+                padding: 15px;
             }
-            table {
-                font-size: 0.9em;
-            }
-            th, td {
-                padding: 6px 4px;
-            }
-            .btn {
-                display: block;
-                width: 100%;
-                margin: 5px 0;
-            }
-            .navigation {
+            
+            .media-controls {
                 flex-direction: column;
             }
-            .tab-buttons {
-                flex-wrap: wrap;
-            }
-            .tab-button {
-                flex: 1;
-                min-width: 120px;
-                margin-bottom: 5px;
-            }
-        }
-        
-        /* Стили для статуса отправки */
-        .status-message {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-            text-align: center;
-        }
-        .status-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .status-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>ЛР №3<br>Определение отношения теплоёмкостей (тест)</h1>
-        
-        <div class="tab-buttons">
-            <button class="tab-button active" onclick="openTab('test')">Тестирование</button>
-            <button class="tab-button" onclick="openTab('results')">Результаты</button>
-            <button class="tab-button" onclick="openTab('settings')">Настройки</button>
-        </div>
+        <header>
+            <h1><i class="fas fa-camera"></i> Расширенная система тестирования</h1>
+            <p>С поддержкой работы с файлами, камерой и аудио</p>
+        </header>
 
-        <!-- Тестирование -->
-        <div id="test" class="tab active">
-            <div class="mode-toggle">
-                <label>
-                    <input type="checkbox" id="modeToggle" onchange="toggleMode()">
-                    <strong>Режим обучения</strong> (подсказки доступны, оценка не начисляется)
-                </label>
-            </div>
-
-            <!-- Прогресс-бар -->
+        <div class="card">
             <div class="progress-container">
-                <div class="timer" id="timer">Время: 0:00</div>
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                    <div class="progress-fill" id="progress" style="width: 30%"></div>
                 </div>
-                <div class="progress-text" id="progress-text">Отвечено на 0 из 12 вопросов</div>
-            </div>
-
-            <!-- Навигация по вопросам -->
-            <div class="question-nav">
-                <div id="question-numbers">
-                    <!-- JavaScript заполнит это -->
+                <div class="progress-text">
+                    <span>Прогресс: 3/10</span>
+                    <span>30% завершено</span>
                 </div>
             </div>
 
-            <div class="section">
-                <h3 class="section-title">Вопросы</h3>
-                <table>
-                    <tr>
-                        <td>1. Что такое теплоёмкость?</td>
-                        <td>
-                            <select id="q1">
-                                <option value="">Выберите ответ</option>
-                                <option value="heat_capacity">Теплота, необходимая для нагрева тела на 1 К</option>
-                                <option value="wrong1">Способность тела сохранять температуру</option>
-                                <option value="wrong2">Температуропроводность вещества</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h1')">?</button>
-                            <div id="h1" class="hint">C* = δQ/dT (теплота для нагрева на 1 К)</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2. Что такое удельная теплоёмкость?</td>
-                        <td>
-                            <select id="q2">
-                                <option value="">Выберите ответ</option>
-                                <option value="specific">Теплоёмкость единицы массы вещества</option>
-                                <option value="wrong1">Теплоёмкость одного моля</option>
-                                <option value="wrong2">Теплоёмкость при постоянном давлении</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h2')">?</button>
-                            <div id="h2" class="hint">c = C*/m (теплоёмкость единицы массы)</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3. Что такое молярная теплоёмкость?</td>
-                        <td>
-                            <select id="q3">
-                                <option value="">Выберите ответ</option>
-                                <option value="molar">Теплоёмкость одного моля вещества</option>
-                                <option value="wrong1">Теплоёмкость единицы массы</option>
-                                <option value="wrong2">Теплоёмкость при постоянном объёме</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h3')">?</button>
-                            <div id="h3" class="hint">C = C*/ν (теплоёмкость одного моля)</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>4. Какой процесс называется адиабатическим?</td>
-                        <td>
-                            <select id="q4">
-                                <option value="">Выберите ответ</option>
-                                <option value="no_heat">Процесс без теплообмена с окружающей средой</option>
-                                <option value="wrong1">Процесс при постоянной температуре</option>
-                                <option value="wrong2">Процесс при постоянном давлении</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h4')">?</button>
-                            <div id="h4" class="hint">Адиабатический процесс: δQ = 0 (нет теплообмена)</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>5. Уравнение адиабатического процесса (Пуассона):</td>
-                        <td>
-                            <select id="q5">
-                                <option value="">Выберите ответ</option>
-                                <option value="poisson">PV<sup>γ</sup> = const</option>
-                                <option value="wrong1">PV = const</option>
-                                <option value="wrong2">P/T = const</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h5')">?</button>
-                            <div id="h5" class="hint">Уравнение Пуассона: PV<sup>γ</sup> = const, γ = C<sub>p</sub>/C<sub>v</sub></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>6. Как связаны молярные теплоёмкости C<sub>p</sub> и C<sub>v</sub>?</td>
-                        <td>
-                            <select id="q6">
-                                <option value="">Выберите ответ</option>
-                                <option value="mayer">C<sub>p</sub> = C<sub>v</sub> + R</option>
-                                <option value="wrong1">C<sub>p</sub> = C<sub>v</sub></option>
-                                <option value="wrong2">C<sub>p</sub> = C<sub>v</sub> - R</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h6')">?</button>
-                            <div id="h6" class="hint">Соотношение Майера: C<sub>p</sub> = C<sub>v</sub> + R</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>7. Чему равен показатель адиабаты γ для идеального одноатомного газа?</td>
-                        <td>
-                            <select id="q7">
-                                <option value="">Выберите ответ</option>
-                                <option value="monoatomic">5/3 ≈ 1.67</option>
-                                <option value="wrong1">7/5 = 1.4</option>
-                                <option value="wrong2">4/3 ≈ 1.33</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h7')">?</button>
-                            <div id="h7" class="hint">γ = (i+2)/i, для одноатомного i=3 → γ=5/3</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>8. Чему равен показатель адиабаты γ для идеального двухатомного газа?</td>
-                        <td>
-                            <select id="q8">
-                                <option value="">Выберите ответ</option>
-                                <option value="diatomic">7/5 = 1.4</option>
-                                <option value="wrong1">5/3 ≈ 1.67</option>
-                                <option value="wrong2">4/3 ≈ 1.33</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h8')">?</button>
-                            <div id="h8" class="hint">γ = (i+2)/i, для двухатомного i=5 → γ=7/5</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>9. Формула для скорости звука в газе через показатель адиабаты:</td>
-                        <td>
-                            <select id="q9">
-                                <option value="">Выберите ответ</option>
-                                <option value="sound_speed">w<sub>зв</sub> = √(γRT/M)</option>
-                                <option value="wrong1">w<sub>зв</sub> = γRT/M</option>
-                                <option value="wrong2">w<sub>зв</sub> = √(γR/T)</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h9')">?</button>
-                            <div id="h9" class="hint">Скорость звука: w<sub>зв</sub> = √(γRT/M)</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>10. Первый закон термодинамики для адиабатического процесса:</td>
-                        <td>
-                            <select id="q10">
-                                <option value="">Выберите ответ</option>
-                                <option value="first_law">δQ = 0, dU = -δA</option>
-                                <option value="wrong1">δQ = dU</option>
-                                <option value="wrong2">δQ = dU + δA</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h10')">?</button>
-                            <div id="h10" class="hint">Адиабата: δQ = 0 → dU = -δA</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>11. Почему C<sub>p</sub> > C<sub>v</sub>?</td>
-                        <td>
-                            <select id="q11">
-                                <option value="">Выберите ответ</option>
-                                <option value="work">При постоянном давлении газ совершает работу</option>
-                                <option value="wrong1">При постоянном объёме газ нагревается сильнее</option>
-                                <option value="wrong2">Из-за разной молярной массы</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h11')">?</button>
-                            <div id="h11" class="hint">При P=const часть теплоты идёт на работу расширения</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>12. Какое значение γ ожидается для воздуха в данной работе?</td>
-                        <td>
-                            <select id="q12">
-                                <option value="">Выберите ответ</option>
-                                <option value="air">~1.4 (двухатомный газ)</option>
-                                <option value="wrong1">~1.67 (одноатомный газ)</option>
-                                <option value="wrong2">~1.33 (многоатомный газ)</option>
-                            </select>
-                        </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h12')">?</button>
-                            <div id="h12" class="hint">Воздух: в основном N₂ и O₂ (двухатомные) → γ≈1.4</div>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-
-            <button class="btn" onclick="saveAnswers()">Сохранить ответы</button>
-            <button class="btn" onclick="openTab('results')">К результатам →</button>
-        </div>
-
-        <!-- Результаты -->
-        <div id="results" class="tab">
-            <div class="section">
-                <h3 class="section-title">Результаты</h3>
-
-                <div style="margin-bottom:15px; padding:10px; background-color:#eaf2f8; border-radius:4px;">
-                    <strong>Ученик:</strong> <span id="studentNameDisplay">—</span>
-                </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Макс. балл</th>
-                            <th>Ваш балл</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><th>25</th><td id="totalScore">0</td></tr>
-                    </tbody>
-                </table>
-
-                <div class="result">
-                    <p><strong>Оценка:</strong> <span id="grade">Неудовлетворительно</span></p>
-                    <p class="score" id="scoreText">Ваш результат: 0 из 25 баллов</p>
-                </div>
-
-                <div id="telegramStatus"></div>
-
-                <button class="btn" onclick="calculateScore()">Пересчитать</button>
-                <button class="btn" id="submitGoogleBtn" onclick="submitToGoogleForm()">Отправить в Google Form</button>
-                <button class="btn btn-telegram" id="submitTelegramBtn" onclick="sendToTelegram()">Отправить в Telegram</button>
-                <button class="btn btn-reset" onclick="resetAll()">Сбросить всё</button>
-            </div>
-            <div class="navigation">
-                <button class="btn" onclick="openTab('test')">← Назад к тесту</button>
+            <div class="question-nav" id="question-nav">
+                <!-- Навигация по вопросам -->
             </div>
         </div>
 
-        <!-- Настройки -->
-        <div id="settings" class="tab">
-            <div class="section">
-                <h3 class="section-title">Настройки Telegram</h3>
-                
-                <div class="telegram-settings">
-                    <label for="botToken">Токен бота:</label>
-                    <input type="text" id="botToken" placeholder="Введите токен бота">
-                    
-                    <label for="chatId">ID чата:</label>
-                    <input type="text" id="chatId" placeholder="Введите ID чата">
-                    
-                    <button class="btn btn-telegram" onclick="saveTelegramSettings()">Сохранить настройки</button>
-                    <button class="btn" onclick="testTelegramSettings()">Проверить соединение</button>
+        <div class="card" id="questions-container">
+            <h3 class="card-title"><i class="fas fa-question-circle"></i> Вопросы с медиа-функциями</h3>
+            
+            <!-- Вопрос 1: Загрузка файлов -->
+            <div class="question" id="q1">
+                <div class="question-text">1. Загрузите файлы для проверки (изображения, документы):</div>
+                <div class="media-container">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <div class="upload-text">Перетащите файлы сюда или нажмите для выбора</div>
+                        <div class="upload-hint">Поддерживаются: JPG, PNG, PDF, DOC, DOCX (макс. 10MB)</div>
+                    </div>
+                    <input type="file" id="fileInput" class="hidden" multiple accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
+                    <div class="file-list" id="fileList">
+                        <!-- Список загруженных файлов -->
+                    </div>
+                    <button class="btn" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i> Выбрать файлы
+                    </button>
                 </div>
             </div>
-            <div class="navigation">
-                <button class="btn" onclick="openTab('test')">← Назад к тесту</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Приветственное окно -->
-    <div id="welcomeModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-        <div style="background:white; padding:20px; border-radius:8px; width:300px; text-align:center;">
-            <h3 style="margin-top:0; color:#2c3e50;">Добро пожаловать!</h3>
-            <p>Введите ваше имя и фамилию:</p>
-            <input type="text" id="studentNameInput" style="width:100%; padding:8px; margin:10px 0; border:1px solid #ccc; border-radius:4px;" placeholder="Напр.: Иванов Иван">
-            <div style="display:flex; justify-content:space-between; gap:10px; margin-top:15px;">
-                <button style="padding:8px 16px; border:none; border-radius:4px; background:#3498db; color:white; cursor:pointer;" onclick="saveStudentName()">OK</button>
-                <button style="padding:8px 16px; border:none; border-radius:4px; background:#e74c3c; color:white; cursor:pointer;" onclick="closeWelcomeModal()">Отмена</button>
+            <!-- Вопрос 2: Использование камеры -->
+            <div class="question" id="q2">
+                <div class="question-text">2. Сделайте фотографию с помощью камеры:</div>
+                <div class="media-container">
+                    <div class="camera-preview" id="cameraPreview">
+                        <video id="videoElement" autoplay playsinline></video>
+                        <img id="capturedImage" class="captured-image">
+                    </div>
+                    <div class="media-controls">
+                        <button class="btn btn-success" id="startCameraBtn" onclick="startCamera()">
+                            <i class="fas fa-camera"></i> Включить камеру
+                        </button>
+                        <button class="btn btn-warning" id="captureBtn" onclick="captureImage()" disabled>
+                            <i class="fas fa-camera-retro"></i> Сделать снимок
+                        </button>
+                        <button class="btn btn-danger" id="stopCameraBtn" onclick="stopCamera()" disabled>
+                            <i class="fas fa-stop"></i> Выключить камеру
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вопрос 3: Запись аудио -->
+            <div class="question" id="q3">
+                <div class="question-text">3. Запишите аудио-ответ на вопрос:</div>
+                <div class="media-container">
+                    <div class="audio-visualizer" id="audioVisualizer">
+                        <!-- Визуализатор аудио -->
+                    </div>
+                    <div class="recording-indicator" id="recordingIndicator" style="display: none;">
+                        <div class="pulse"></div>
+                        <span>Идет запись...</span>
+                    </div>
+                    <div class="media-controls">
+                        <button class="btn btn-success" id="startRecordingBtn" onclick="startRecording()">
+                            <i class="fas fa-microphone"></i> Начать запись
+                        </button>
+                        <button class="btn btn-danger" id="stopRecordingBtn" onclick="stopRecording()" disabled>
+                            <i class="fas fa-stop"></i> Остановить запись
+                        </button>
+                    </div>
+                    <div class="audio-player" id="audioPlayer" style="display: none;">
+                        <audio id="audioElement" controls></audio>
+                        <button class="btn" onclick="deleteRecording()" style="margin-top: 10px;">
+                            <i class="fas fa-trash"></i> Удалить запись
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вопрос 4: Захват экрана -->
+            <div class="question" id="q4">
+                <div class="question-text">4. Сделайте скриншот экрана:</div>
+                <div class="media-container">
+                    <div class="preview-container" id="screenshotPreview">
+                        <i class="fas fa-desktop" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i>
+                        <div class="upload-text">Скриншот появится здесь</div>
+                    </div>
+                    <div class="media-controls">
+                        <button class="btn btn-success" onclick="captureScreen()">
+                            <i class="fas fa-desktop"></i> Сделать скриншот
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вопрос 5: Геолокация -->
+            <div class="question" id="q5">
+                <div class="question-text">5. Поделитесь вашим местоположением:</div>
+                <div class="media-container">
+                    <div class="preview-container" id="locationPreview">
+                        <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i>
+                        <div class="upload-text">Информация о местоположении появится здесь</div>
+                    </div>
+                    <div class="media-controls">
+                        <button class="btn btn-success" onclick="getLocation()">
+                            <i class="fas fa-location-arrow"></i> Получить местоположение
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вопрос 6: Рисование -->
+            <div class="question" id="q6">
+                <div class="question-text">6. Нарисуйте схему или диаграмму:</div>
+                <div class="media-container">
+                    <canvas id="drawingCanvas" width="500" height="300" style="border: 1px solid #dee2e6; border-radius: 8px; cursor: crosshair;"></canvas>
+                    <div class="media-controls">
+                        <button class="btn" onclick="clearCanvas()">
+                            <i class="fas fa-eraser"></i> Очистить
+                        </button>
+                        <button class="btn btn-success" onclick="saveDrawing()">
+                            <i class="fas fa-save"></i> Сохранить рисунок
+                        </button>
+                    </div>
+                    <div class="color-picker" style="margin-top: 10px;">
+                        <label>Цвет: </label>
+                        <input type="color" id="drawingColor" value="#4361ee" onchange="changeDrawingColor(this.value)">
+                        <label style="margin-left: 15px;">Толщина: </label>
+                        <input type="range" id="drawingWidth" min="1" max="20" value="3" onchange="changeDrawingWidth(this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопки управления -->
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <button class="btn btn-warning" onclick="resetTest()">
+                    <i class="fas fa-redo"></i> Начать заново
+                </button>
+                <button class="btn btn-success" onclick="finishTest()">
+                    <i class="fas fa-flag-checkered"></i> Завершить тест
+                </button>
             </div>
         </div>
     </div>
 
     <script>
         // Глобальные переменные
-        let isTrainingMode = false;
-        let startTime = null;
-        let timerInterval = null;
-        
-        // Настройки Telegram по умолчанию
-        const DEFAULT_BOT_TOKEN = "8344281396:AAGZ9-M2XRyPMHiI2akBSSIN7QAtRGDmLOY";
-        const DEFAULT_CHAT_ID = "1189539923";
-        
-        function openTab(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            [...document.querySelectorAll('.tab-button')].find(b => b.getAttribute('onclick')?.includes(tabName))?.classList.add('active');
-            
-            if (tabName === 'results' && !isTrainingMode) {
-                calculateScore();
-            }
-            
-            // Обновляем состояние кнопок отправки
-            updateSubmitButtons();
-        }
+        let currentQuestion = 1;
+        let totalQuestions = 6;
+        let answeredQuestions = 0;
+        let mediaStream = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let audioContext = null;
+        let analyser = null;
+        let canvasContext = null;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
 
-        function toggleMode() {
-            isTrainingMode = document.getElementById('modeToggle').checked;
-            localStorage.setItem('mode_LR3', isTrainingMode);
-            updateProgress();
-            
-            // Обновляем видимость подсказок
-            updateHintsVisibility();
-            
-            // Обновляем состояние кнопок отправки
-            updateSubmitButtons();
-        }
-        
-        function updateHintsVisibility() {
-            const hintButtons = document.querySelectorAll('.hint-btn');
-            const hints = document.querySelectorAll('.hint');
-            
-            if (isTrainingMode) {
-                // В режиме обучения показываем кнопки подсказок
-                hintButtons.forEach(btn => btn.classList.remove('hidden'));
-            } else {
-                // В режиме тестирования скрываем кнопки подсказок и закрываем все подсказки
-                hintButtons.forEach(btn => btn.classList.add('hidden'));
-                hints.forEach(hint => hint.classList.remove('show'));
-            }
-        }
-        
-        function updateSubmitButtons() {
-            const submitGoogleBtn = document.getElementById('submitGoogleBtn');
-            const submitTelegramBtn = document.getElementById('submitTelegramBtn');
-            
-            if (isTrainingMode) {
-                // В режиме обучения отключаем кнопки отправки
-                submitGoogleBtn.disabled = true;
-                submitTelegramBtn.disabled = true;
-                submitGoogleBtn.title = "Отправка недоступна в режиме обучения";
-                submitTelegramBtn.title = "Отправка недоступна в режиме обучения";
-            } else {
-                // В режиме тестирования включаем кнопки отправки
-                submitGoogleBtn.disabled = false;
-                submitTelegramBtn.disabled = false;
-                submitGoogleBtn.title = "";
-                submitTelegramBtn.title = "";
-            }
-        }
-        
-        function toggleHint(id) {
-            if (isTrainingMode) {
-                document.getElementById(id).classList.toggle('show');
-            }
-        }
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeQuestionNavigation();
+            initializeFileUpload();
+            initializeDrawingCanvas();
+        });
 
-        function saveStudentName() {
-            const name = document.getElementById('studentNameInput').value.trim();
-            if (!name) { alert('Введите имя и фамилию.'); return; }
-            localStorage.setItem('studentName_LR3', name);
-            document.getElementById('welcomeModal').style.display = 'none';
-            document.getElementById('studentNameDisplay').textContent = name;
+        // Инициализация навигации по вопросам
+        function initializeQuestionNavigation() {
+            const navContainer = document.getElementById('question-nav');
+            navContainer.innerHTML = '';
             
-            // Запускаем таймер при первом вводе имени
-            if (!startTime) {
-                startTimer();
-            }
-        }
-        
-        function closeWelcomeModal() {
-            const saved = localStorage.getItem('studentName_LR3');
-            if (!saved) { 
-                alert('Пожалуйста, введите ваше имя для продолжения.'); 
-                return; 
-            }
-            document.getElementById('welcomeModal').style.display = 'none';
-            document.getElementById('studentNameDisplay').textContent = saved;
-        }
-
-        // Функция для запуска таймера
-        function startTimer() {
-            startTime = Date.now();
-            timerInterval = setInterval(updateTimer, 1000);
-        }
-        
-        // Функция для обновления таймера
-        function updateTimer() {
-            if (!startTime) return;
-            
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            const minutes = Math.floor(elapsed / 60);
-            const seconds = elapsed % 60;
-            document.getElementById('timer').textContent = `Время: ${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-        
-        // Функция для обновления прогресса
-        function updateProgress() {
-            let answered = 0;
-            for (let i = 1; i <= 12; i++) {
-                if (document.getElementById('q'+i).value) answered++;
-            }
-            const progress = (answered / 12) * 100;
-            document.getElementById('progress').style.width = progress + '%';
-            document.getElementById('progress-text').textContent = `Отвечено на ${answered} из 12 вопросов`;
-            
-            // Обновляем навигацию по вопросам
-            updateQuestionNavigation();
-            
-            // Меняем цвет прогресс-бара в зависимости от заполнения
-            const progressFill = document.getElementById('progress');
-            if (progress < 50) {
-                progressFill.style.backgroundColor = '#e74c3c';
-            } else if (progress < 100) {
-                progressFill.style.backgroundColor = '#f39c12';
-            } else {
-                progressFill.style.backgroundColor = '#2ecc71';
-            }
-        }
-        
-        // Функция для обновления навигации по вопросам
-        function updateQuestionNavigation() {
-            const container = document.getElementById('question-numbers');
-            container.innerHTML = '';
-            
-            for (let i = 1; i <= 12; i++) {
-                const questionNumber = document.createElement('span');
+            for (let i = 1; i <= totalQuestions; i++) {
+                const questionNumber = document.createElement('div');
                 questionNumber.className = 'question-number';
-                questionNumber.textContent = i;
-                questionNumber.id = 'q-nav-' + i;
-                
-                // Добавляем классы в зависимости от состояния
-                if (document.getElementById('q'+i).value) {
+                if (i === currentQuestion) {
+                    questionNumber.classList.add('active');
+                }
+                if (i <= answeredQuestions) {
                     questionNumber.classList.add('answered');
                 }
+                questionNumber.textContent = i;
+                questionNumber.addEventListener('click', () => navigateToQuestion(i));
+                navContainer.appendChild(questionNumber);
+            }
+        }
+
+        // Навигация к вопросу
+        function navigateToQuestion(questionNum) {
+            currentQuestion = questionNum;
+            
+            // Обновляем активный вопрос в навигации
+            document.querySelectorAll('.question-number').forEach((el, index) => {
+                if (index + 1 === questionNum) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+            
+            // Прокручиваем к вопросу
+            const questionElement = document.getElementById(`q${questionNum}`);
+            if (questionElement) {
+                questionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Инициализация загрузки файлов
+        function initializeFileUpload() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            
+            // Обработка клика по области загрузки
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // Обработка выбора файлов
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            // Обработка перетаскивания файлов
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#4361ee';
+                uploadArea.style.background = 'rgba(67, 97, 238, 0.05)';
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '#dee2e6';
+                uploadArea.style.background = 'white';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#dee2e6';
+                uploadArea.style.background = 'white';
                 
-                // Добавляем обработчик клика для навигации
-                questionNumber.addEventListener('click', function() {
-                    scrollToQuestion(i);
-                });
-                
-                container.appendChild(questionNumber);
-            }
-        }
-        
-        // Функция для прокрутки к вопросу
-        function scrollToQuestion(qNum) {
-            const questionRow = document.getElementById('q'+qNum).closest('tr');
-            if (questionRow) {
-                questionRow.scrollIntoView({behavior: 'smooth', block: 'center'});
-                
-                // Подсвечиваем текущий вопрос
-                document.querySelectorAll('.question-number').forEach(q => q.classList.remove('active'));
-                document.getElementById('q-nav-' + qNum).classList.add('active');
-            }
-        }
-        
-        // Функция для валидации формы
-        function validateForm() {
-            if (isTrainingMode) return true; // В режиме обучения валидация не требуется
-            
-            let allAnswered = true;
-            let firstEmpty = null;
-            
-            for (let i = 1; i <= 12; i++) {
-                if (!document.getElementById('q'+i).value) {
-                    allAnswered = false;
-                    if (!firstEmpty) firstEmpty = i;
+                if (e.dataTransfer.files.length) {
+                    handleFiles(e.dataTransfer.files);
                 }
-            }
-            
-            if (!allAnswered) {
-                if (confirm('Вы ответили не на все вопросы. Хотите перейти к первому неотвеченному вопросу?')) {
-                    scrollToQuestion(firstEmpty);
-                }
-                return false;
-            }
-            
-            return true;
-        }
-
-        function saveAnswers() {
-            if (!validateForm()) {
-                return;
-            }
-            
-            for (let i = 1; i <= 12; i++) {
-                localStorage.setItem('q'+i+'_LR3', document.getElementById('q'+i).value);
-            }
-            localStorage.setItem('mode_LR3', isTrainingMode);
-            
-            updateProgress(); // Обновляем прогресс
-            
-            if (!isTrainingMode) {
-                calculateScore();
-                alert('Ответы сохранены и оценены!');
-            } else {
-                alert('Режим обучения: ответы сохранены.');
-            }
-        }
-
-        function calculateScore() {
-            let score = 0;
-            const correct = {
-                q1: 'heat_capacity', q2: 'specific', q3: 'molar', q4: 'no_heat',
-                q5: 'poisson', q6: 'mayer', q7: 'monoatomic', q8: 'diatomic',
-                q9: 'sound_speed', q10: 'first_law', q11: 'work', q12: 'air'
-            };
-            // Первые 8 — по 2 балла, последние 4 — по 3 балла
-            for (let i = 1; i <= 8; i++) {
-                if (localStorage.getItem('q'+i+'_LR3') === correct['q'+i]) score += 2;
-            }
-            for (let i = 9; i <= 12; i++) {
-                if (localStorage.getItem('q'+i+'_LR3') === correct['q'+i]) score += 3;
-            }
-            document.getElementById('totalScore').textContent = score;
-            let grade = 'Неудовлетворительно';
-            if (score >= 22) grade = 'Отлично';
-            else if (score >= 17) grade = 'Хорошо';
-            else if (score >= 12) grade = 'Удовлетворительно';
-            document.getElementById('grade').textContent = grade;
-            document.getElementById('scoreText').textContent = `Ваш результат: ${score} из 25 баллов`;
-        }
-
-        function submitToGoogleForm() {
-            if (isTrainingMode) {
-                alert('Отправка результатов недоступна в режиме обучения.');
-                return;
-            }
-            
-            const name = document.getElementById('studentNameDisplay').textContent;
-            const score = document.getElementById('totalScore').textContent;
-            const grade = document.getElementById('grade').textContent;
-            const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScJIoC2AV7Hrb0BHfmXp4Ixbkm303I-pUvcfnY959YJSuiaOQ/viewform';
-            const url = `${formUrl}?entry.232303525=${encodeURIComponent(name)}&entry.56933389=${score}&entry.1512158149=${encodeURIComponent(grade)}`;
-            window.open(url, '_blank');
-        }
-
-        // Функции для работы с Telegram
-        function saveTelegramSettings() {
-            const botToken = document.getElementById('botToken').value.trim();
-            const chatId = document.getElementById('chatId').value.trim();
-            
-            if (!botToken || !chatId) {
-                alert('Пожалуйста, заполните все поля настроек Telegram.');
-                return;
-            }
-            
-            localStorage.setItem('telegramBotToken', botToken);
-            localStorage.setItem('telegramChatId', chatId);
-            alert('Настройки Telegram сохранены!');
-        }
-        
-        function loadTelegramSettings() {
-            let botToken = localStorage.getItem('telegramBotToken');
-            let chatId = localStorage.getItem('telegramChatId');
-            
-            // Если настройки не сохранены, используем значения по умолчанию
-            if (!botToken) {
-                botToken = DEFAULT_BOT_TOKEN;
-                localStorage.setItem('telegramBotToken', botToken);
-            }
-            if (!chatId) {
-                chatId = DEFAULT_CHAT_ID;
-                localStorage.setItem('telegramChatId', chatId);
-            }
-            
-            document.getElementById('botToken').value = botToken;
-            document.getElementById('chatId').value = chatId;
-        }
-        
-        function testTelegramSettings() {
-            const botToken = document.getElementById('botToken').value.trim();
-            const chatId = document.getElementById('chatId').value.trim();
-            
-            if (!botToken || !chatId) {
-                alert('Пожалуйста, сначала сохраните настройки Telegram.');
-                return;
-            }
-            
-            showTelegramStatus('Проверка соединения с Telegram...', 'info');
-            
-            sendTelegramMessage(botToken, chatId, '✅ Тестовое сообщение: настройки Telegram работают корректно!')
-                .then(() => {
-                    showTelegramStatus('Тестовое сообщение отправлено успешно! Проверьте Telegram.', 'success');
-                })
-                .catch(error => {
-                    showTelegramStatus('Ошибка отправки: ' + error, 'error');
-                });
-        }
-        
-        function sendToTelegram() {
-            if (isTrainingMode) {
-                alert('Отправка результатов недоступна в режиме обучения.');
-                return;
-            }
-            
-            const botToken = localStorage.getItem('telegramBotToken') || document.getElementById('botToken').value.trim();
-            const chatId = localStorage.getItem('telegramChatId') || document.getElementById('chatId').value.trim();
-            
-            if (!botToken || !chatId) {
-                alert('Настройки Telegram не заданы. Перейдите в раздел "Настройки" для их конфигурации.');
-                openTab('settings');
-                return;
-            }
-            
-            const name = document.getElementById('studentNameDisplay').textContent;
-            const score = document.getElementById('totalScore').textContent;
-            const grade = document.getElementById('grade').textContent;
-            
-            // Получаем детали ответов
-            let answersDetail = "Детали ответов:\n";
-            const correctAnswers = {
-                q1: 'heat_capacity', q2: 'specific', q3: 'molar', q4: 'no_heat',
-                q5: 'poisson', q6: 'mayer', q7: 'monoatomic', q8: 'diatomic',
-                q9: 'sound_speed', q10: 'first_law', q11: 'work', q12: 'air'
-            };
-            
-            let correctCount = 0;
-            for (let i = 1; i <= 12; i++) {
-                const userAnswer = localStorage.getItem('q'+i+'_LR3');
-                const isCorrect = userAnswer === correctAnswers['q'+i];
-                if (isCorrect) correctCount++;
-                answersDetail += `${i}. ${isCorrect ? '✅' : '❌'} ${isCorrect ? 'Правильно' : 'Неправильно'}\n`;
-            }
-            
-            const message = `📊 Результаты теста "Отношение теплоёмкостей":
-            
-👤 Студент: ${name}
-🎯 Баллы: ${score}/25 (${correctCount}/12 правильных ответов)
-📝 Оценка: ${grade}
-
-${answersDetail}
-⏱ Время выполнения: ${document.getElementById('timer').textContent}
-📅 Дата: ${new Date().toLocaleString('ru-RU')}`;
-            
-            showTelegramStatus('Отправка результатов в Telegram...', 'info');
-            
-            sendTelegramMessage(botToken, chatId, message)
-                .then(() => {
-                    showTelegramStatus('Результаты успешно отправлены в Telegram!', 'success');
-                })
-                .catch(error => {
-                    showTelegramStatus('Ошибка отправки в Telegram: ' + error, 'error');
-                });
-        }
-        
-        function showTelegramStatus(message, type) {
-            const statusElement = document.getElementById('telegramStatus');
-            statusElement.textContent = message;
-            statusElement.className = 'status-message';
-            
-            if (type === 'success') {
-                statusElement.classList.add('status-success');
-            } else if (type === 'error') {
-                statusElement.classList.add('status-error');
-            }
-            
-            // Автоматически скрыть сообщение через 5 секунд
-            setTimeout(() => {
-                statusElement.textContent = '';
-                statusElement.className = '';
-            }, 5000);
-        }
-        
-        function sendTelegramMessage(botToken, chatId, text) {
-            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-            
-            return fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: text,
-                    parse_mode: 'Markdown'
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Ошибка сети: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (!data.ok) {
-                    throw new Error('Telegram API: ' + data.description);
-                }
-                return data;
             });
         }
 
-        function resetAll() {
-            if (confirm('Вы уверены, что хотите сбросить все ответы и начать заново? Это действие нельзя отменить.')) {
-                // Сохраняем настройки Telegram перед сбросом
-                const telegramToken = localStorage.getItem('telegramBotToken');
-                const telegramChatId = localStorage.getItem('telegramChatId');
+        // Обработка выбора файлов через input
+        function handleFileSelect(e) {
+            handleFiles(e.target.files);
+        }
+
+        // Обработка файлов
+        function handleFiles(files) {
+            const fileList = document.getElementById('fileList');
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
                 
-                localStorage.clear();
-                
-                // Восстанавливаем настройки Telegram
-                if (telegramToken) localStorage.setItem('telegramBotToken', telegramToken);
-                if (telegramChatId) localStorage.setItem('telegramChatId', telegramChatId);
-                
-                for (let i = 1; i <= 12; i++) {
-                    document.getElementById('q'+i).value = '';
+                // Проверка размера файла (макс. 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`Файл "${file.name}" слишком большой. Максимальный размер: 10MB.`);
+                    continue;
                 }
-                document.getElementById('modeToggle').checked = false;
-                isTrainingMode = false;
-                document.getElementById('totalScore').textContent = '0';
-                document.getElementById('grade').textContent = 'Неудовлетворительно';
-                document.getElementById('scoreText').textContent = 'Ваш результат: 0 из 25 баллов';
-                document.getElementById('studentNameDisplay').textContent = '—';
                 
-                // Сброс таймера
-                if (timerInterval) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
+                // Создание элемента файла
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                // Определение иконки по типу файла
+                let fileIcon = 'fa-file';
+                if (file.type.startsWith('image/')) {
+                    fileIcon = 'fa-file-image';
+                } else if (file.type === 'application/pdf') {
+                    fileIcon = 'fa-file-pdf';
+                } else if (file.type.includes('document') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+                    fileIcon = 'fa-file-word';
                 }
-                startTime = null;
-                document.getElementById('timer').textContent = 'Время: 0:00';
+                
+                // Форматирование размера файла
+                const fileSize = formatFileSize(file.size);
+                
+                fileItem.innerHTML = `
+                    <i class="fas ${fileIcon} file-icon"></i>
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${fileSize}</div>
+                    </div>
+                    <button class="file-remove" onclick="removeFile(this)"><i class="fas fa-times"></i></button>
+                `;
+                
+                fileList.appendChild(fileItem);
+                
+                // Если это изображение, показываем превью
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'preview-image';
+                        img.style.maxWidth = '100px';
+                        img.style.maxHeight = '100px';
+                        fileItem.querySelector('.file-info').appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            // Обновляем прогресс
+            updateProgress();
+        }
+
+        // Удаление файла
+        function removeFile(button) {
+            const fileItem = button.parentElement;
+            fileItem.remove();
+            updateProgress();
+        }
+
+        // Форматирование размера файла
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Работа с камерой
+        async function startCamera() {
+            try {
+                // Запрос доступа к камере
+                mediaStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                
+                const videoElement = document.getElementById('videoElement');
+                videoElement.srcObject = mediaStream;
+                
+                // Активируем кнопки
+                document.getElementById('startCameraBtn').disabled = true;
+                document.getElementById('captureBtn').disabled = false;
+                document.getElementById('stopCameraBtn').disabled = false;
                 
                 updateProgress();
-                document.getElementById('welcomeModal').style.display = 'flex';
+            } catch (error) {
+                console.error('Ошибка доступа к камере:', error);
+                alert('Не удалось получить доступ к камере. Проверьте разрешения.');
             }
         }
 
-        window.onload = function() {
-            const name = localStorage.getItem('studentName_LR3');
-            if (name) {
-                document.getElementById('studentNameDisplay').textContent = name;
-                // Запускаем таймер, если имя уже сохранено
-                startTimer();
-            } else {
-                document.getElementById('welcomeModal').style.display = 'flex';
-            }
-
-            isTrainingMode = localStorage.getItem('mode_LR3') === 'true';
-            document.getElementById('modeToggle').checked = isTrainingMode;
-
-            for (let i = 1; i <= 12; i++) {
-                const val = localStorage.getItem('q'+i+'_LR3');
-                if (val) document.getElementById('q'+i).value = val;
-                
-                // Добавляем обработчики изменений для автоматического сохранения
-                document.getElementById('q'+i).addEventListener('change', function() {
-                    localStorage.setItem('q'+i+'_LR3', this.value);
-                    updateProgress();
-                });
-            }
-
-            // Загружаем настройки Telegram
-            loadTelegramSettings();
-
-            // Инициализируем прогресс и навигацию
+        // Снимок с камеры
+        function captureImage() {
+            const videoElement = document.getElementById('videoElement');
+            const capturedImage = document.getElementById('capturedImage');
+            
+            // Создаем canvas для захвата кадра
+            const canvas = document.createElement('canvas');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            
+            const context = canvas.getContext('2d');
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            
+            // Сохраняем изображение
+            capturedImage.src = canvas.toDataURL('image/png');
+            capturedImage.style.display = 'block';
+            videoElement.style.display = 'none';
+            
             updateProgress();
-            updateQuestionNavigation();
-            
-            // Обновляем видимость подсказок
-            updateHintsVisibility();
-            
-            // Обновляем состояние кнопок отправки
-            updateSubmitButtons();
+        }
 
-            if (!isTrainingMode) {
-                calculateScore();
+        // Остановка камеры
+        function stopCamera() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
             }
-        };
+            
+            const videoElement = document.getElementById('videoElement');
+            videoElement.srcObject = null;
+            
+            // Деактивируем кнопки
+            document.getElementById('startCameraBtn').disabled = false;
+            document.getElementById('captureBtn').disabled = true;
+            document.getElementById('stopCameraBtn').disabled = true;
+            
+            // Сбрасываем отображение
+            videoElement.style.display = 'block';
+            document.getElementById('capturedImage').style.display = 'none';
+        }
+
+        // Запись аудио
+        async function startRecording() {
+            try {
+                // Запрос доступа к микрофону
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                // Создаем MediaRecorder
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                // Обработка данных записи
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                // Обработка завершения записи
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    const audioElement = document.getElementById('audioElement');
+                    audioElement.src = audioUrl;
+                    
+                    document.getElementById('audioPlayer').style.display = 'block';
+                    document.getElementById('recordingIndicator').style.display = 'none';
+                    
+                    updateProgress();
+                };
+                
+                // Запуск записи
+                mediaRecorder.start();
+                
+                // Визуализация аудио
+                setupAudioVisualizer(stream);
+                
+                // Обновляем UI
+                document.getElementById('startRecordingBtn').disabled = true;
+                document.getElementById('stopRecordingBtn').disabled = false;
+                document.getElementById('recordingIndicator').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Ошибка доступа к микрофону:', error);
+                alert('Не удалось получить доступ к микрофону. Проверьте разрешения.');
+            }
+        }
+
+        // Остановка записи аудио
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                
+                // Останавливаем все треки
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                
+                // Обновляем UI
+                document.getElementById('startRecordingBtn').disabled = false;
+                document.getElementById('stopRecordingBtn').disabled = true;
+            }
+        }
+
+        // Удаление записи
+        function deleteRecording() {
+            document.getElementById('audioElement').src = '';
+            document.getElementById('audioPlayer').style.display = 'none';
+            updateProgress();
+        }
+
+        // Настройка визуализатора аудио
+        function setupAudioVisualizer(stream) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaStreamSource(stream);
+            
+            source.connect(analyser);
+            analyser.fftSize = 256;
+            
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            const visualizer = document.getElementById('audioVisualizer');
+            visualizer.innerHTML = '';
+            
+            // Создаем бары для визуализации
+            for (let i = 0; i < bufferLength; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'audio-bar';
+                bar.style.left = `${(i / bufferLength) * 100}%`;
+                bar.style.height = '0px';
+                visualizer.appendChild(bar);
+            }
+            
+            // Функция обновления визуализации
+            function updateVisualization() {
+                if (!analyser) return;
+                
+                analyser.getByteFrequencyData(dataArray);
+                
+                const bars = visualizer.querySelectorAll('.audio-bar');
+                for (let i = 0; i < bars.length; i++) {
+                    const value = dataArray[i];
+                    const height = (value / 255) * 100;
+                    bars[i].style.height = `${height}%`;
+                }
+                
+                requestAnimationFrame(updateVisualization);
+            }
+            
+            updateVisualization();
+        }
+
+        // Захват экрана
+        async function captureScreen() {
+            try {
+                // Запрос на захват экрана
+                const stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { cursor: "always" },
+                    audio: false
+                });
+                
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    
+                    // Создаем canvas для захвата
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    const context = canvas.getContext('2d');
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    // Отображаем скриншот
+                    const screenshotPreview = document.getElementById('screenshotPreview');
+                    screenshotPreview.innerHTML = '';
+                    
+                    const img = document.createElement('img');
+                    img.src = canvas.toDataURL('image/png');
+                    img.className = 'preview-image';
+                    screenshotPreview.appendChild(img);
+                    
+                    // Останавливаем поток
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    updateProgress();
+                };
+            } catch (error) {
+                console.error('Ошибка захвата экрана:', error);
+                alert('Не удалось сделать скриншот. Возможно, вы отменили выбор области.');
+            }
+        }
+
+        // Получение геолокации
+        function getLocation() {
+            if (!navigator.geolocation) {
+                alert('Геолокация не поддерживается вашим браузером');
+                return;
+            }
+            
+            const locationPreview = document.getElementById('locationPreview');
+            locationPreview.innerHTML = '<div class="upload-text">Определение местоположения...</div>';
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    
+                    locationPreview.innerHTML = `
+                        <div class="upload-text">Ваше местоположение:</div>
+                        <div>Широта: ${latitude.toFixed(6)}</div>
+                        <div>Долгота: ${longitude.toFixed(6)}</div>
+                        <div>Точность: ±${position.coords.accuracy} метров</div>
+                    `;
+                    
+                    updateProgress();
+                },
+                (error) => {
+                    console.error('Ошибка геолокации:', error);
+                    let errorMessage = 'Не удалось определить местоположение';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = 'Доступ к геолокации запрещен';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = 'Информация о местоположении недоступна';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = 'Время ожидания определения местоположения истекло';
+                            break;
+                    }
+                    
+                    locationPreview.innerHTML = `<div class="upload-text">${errorMessage}</div>`;
+                }
+            );
+        }
+
+        // Инициализация холста для рисования
+        function initializeDrawingCanvas() {
+            const canvas = document.getElementById('drawingCanvas');
+            canvasContext = canvas.getContext('2d');
+            
+            // Настройка стилей рисования
+            canvasContext.lineJoin = 'round';
+            canvasContext.lineCap = 'round';
+            canvasContext.lineWidth = document.getElementById('drawingWidth').value;
+            canvasContext.strokeStyle = document.getElementById('drawingColor').value;
+            
+            // Обработчики событий мыши
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Обработчики событий касания (для мобильных устройств)
+            canvas.addEventListener('touchstart', handleTouchStart);
+            canvas.addEventListener('touchmove', handleTouchMove);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        // Начало рисования
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = getEventCoordinates(e);
+        }
+
+        // Рисование
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            
+            const [x, y] = getEventCoordinates(e);
+            
+            canvasContext.beginPath();
+            canvasContext.moveTo(lastX, lastY);
+            canvasContext.lineTo(x, y);
+            canvasContext.stroke();
+            
+            [lastX, lastY] = [x, y];
+        }
+
+        // Остановка рисования
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        // Обработка касаний
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            startDrawing(mouseEvent);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            draw(mouseEvent);
+        }
+
+        // Получение координат события
+        function getEventCoordinates(e) {
+            const canvas = document.getElementById('drawingCanvas');
+            const rect = canvas.getBoundingClientRect();
+            
+            let x, y;
+            
+            if (e.type.includes('touch')) {
+                x = e.touches[0].clientX - rect.left;
+                y = e.touches[0].clientY - rect.top;
+            } else {
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
+            }
+            
+            return [x, y];
+        }
+
+        // Очистка холста
+        function clearCanvas() {
+            const canvas = document.getElementById('drawingCanvas');
+            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Сохранение рисунка
+        function saveDrawing() {
+            const canvas = document.getElementById('drawingCanvas');
+            const dataURL = canvas.toDataURL('image/png');
+            
+            // В реальном приложении здесь можно отправить изображение на сервер
+            // или сохранить его локально
+            const link = document.createElement('a');
+            link.download = 'рисунок.png';
+            link.href = dataURL;
+            link.click();
+            
+            updateProgress();
+        }
+
+        // Изменение цвета рисования
+        function changeDrawingColor(color) {
+            canvasContext.strokeStyle = color;
+        }
+
+        // Изменение толщины линии
+        function changeDrawingWidth(width) {
+            canvasContext.lineWidth = width;
+        }
+
+        // Обновление прогресса
+        function updateProgress() {
+            // В реальном приложении здесь была бы логика подсчета отвеченных вопросов
+            // Для демонстрации просто увеличим прогресс
+            answeredQuestions = Math.min(answeredQuestions + 1, totalQuestions);
+            
+            // Обновляем прогресс-бар
+            const progress = (answeredQuestions / totalQuestions) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+            
+            // Обновляем текст прогресса
+            document.querySelector('.progress-text span:first-child').textContent = 
+                `Прогресс: ${answeredQuestions}/${totalQuestions}`;
+            document.querySelector('.progress-text span:last-child').textContent = 
+                `${Math.round(progress)}% завершено`;
+            
+            // Обновляем навигацию
+            initializeQuestionNavigation();
+        }
+
+        // Завершение теста
+        function finishTest() {
+            alert('Тест завершен! В реальном приложении здесь были бы отправлены все данные на сервер.');
+            
+            // Останавливаем камеру и запись, если они активны
+            stopCamera();
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                stopRecording();
+            }
+        }
+
+        // Сброс теста
+        function resetTest() {
+            if (confirm('Вы уверены, что хотите начать тест заново? Все текущие данные будут потеряны.')) {
+                // Сброс всех данных
+                answeredQuestions = 0;
+                
+                // Очистка файлов
+                document.getElementById('fileList').innerHTML = '';
+                
+                // Остановка камеры
+                stopCamera();
+                
+                // Остановка записи
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    stopRecording();
+                }
+                
+                // Очистка холста
+                clearCanvas();
+                
+                // Сброс других элементов
+                document.getElementById('screenshotPreview').innerHTML = `
+                    <i class="fas fa-desktop" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i>
+                    <div class="upload-text">Скриншот появится здесь</div>
+                `;
+                
+                document.getElementById('locationPreview').innerHTML = `
+                    <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i>
+                    <div class="upload-text">Информация о местоположении появится здесь</div>
+                `;
+                
+                document.getElementById('audioPlayer').style.display = 'none';
+                document.getElementById('recordingIndicator').style.display = 'none';
+                
+                // Обновление прогресса
+                updateProgress();
+                
+                // Прокрутка к началу
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
     </script>
 </body>
 </html>
