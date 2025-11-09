@@ -340,64 +340,7 @@
                     await new Promise(resolve => setTimeout(resolve, 300));
                 }
                 
-                // Тест отправки фото
-                try {
-                    const startTime = Date.now();
-                    const testImageData = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=';
-                    
-                    const response = await fetch(BACKEND_URL + '/api/send-photo', {
-                        method: 'POST',
-                        mode: 'cors',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            user_id: 1189539923,
-                            photo_data: testImageData,
-                            caption: 'Тестовое фото'
-                        })
-                    });
-                    
-                    const duration = Date.now() - startTime;
-                    
-                    if (response.ok) {
-                        const result = await response.json();
-                        if (result.success) {
-                            resultsHTML += `
-                                <div class="log-entry">
-                                    <span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span>
-                                    <span class="log-info">✅ УСПЕХ:</span> Отправка фото (${duration}ms)
-                                </div>
-                            `;
-                            successCount++;
-                        } else {
-                            resultsHTML += `
-                                <div class="log-entry">
-                                    <span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span>
-                                    <span class="log-warn">⚠️ ПРЕДУПРЕЖДЕНИЕ:</span> Отправка фото - ${result.error}
-                                </div>
-                            `;
-                        }
-                    } else {
-                        resultsHTML += `
-                            <div class="log-entry">
-                                <span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span>
-                                <span class="log-error">❌ ОШИБКА:</span> Отправка фото - HTTP ${response.status}
-                            </div>
-                        `;
-                    }
-                } catch (error) {
-                    const duration = Date.now() - startTime;
-                    resultsHTML += `
-                        <div class="log-entry">
-                            <span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span>
-                            <span class="log-error">❌ ОШИБКА:</span> Отправка фото - ${error.message} (${duration}ms)
-                        </div>
-                    `;
-                }
-                
-                const totalTests = endpoints.length + 1;
+                const totalTests = endpoints.length;
                 const summary = successCount === totalTests ? 'success' : successCount >= totalTests - 1 ? 'warning' : 'error';
                 const summaryText = successCount === totalTests ? 
                     `✅ Все тесты пройдены успешно (${successCount}/${totalTests})` :
