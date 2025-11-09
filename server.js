@@ -1,4 +1,4 @@
-// server.js - Сервер для Telegram Web App с камерой
+// server.js - Сервер для Telegram Web App с камерой (версия для Render.com)
 
 const express = require('express');
 const axios = require('axios');
@@ -12,21 +12,15 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-    origin: ['https://web.telegram.org', 'http://localhost:3000', 'http://127.0.0.1:3000'],
+    origin: ['https://web.telegram.org', 'http://localhost:3000', 'https://your-app.onrender.com'],
     credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static('public'));
 
-// 🔐 ВАШ ТОКЕН БОТА (замените на новый после revoke!)
-const BOT_TOKEN = '8344281396:AAGZ9-M2XRyPMHiI2akBSSIN7QAtRGDmLOY';
-
-// Создаем папку для временных файлов
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
+// Токен бота из переменных окружения Render
+const BOT_TOKEN = process.env.BOT_TOKEN || '8344281396:AAGZ9-M2XRyPMHiI2akBSSIN7QAtRGDmLOY';
 
 // Функция для отправки фото в Telegram
 async function sendPhotoToBot(chatId, photoBuffer, caption = '') {
@@ -60,23 +54,6 @@ async function sendPhotoToBot(chatId, photoBuffer, caption = '') {
     }
 }
 
-// Функция для отправки уведомления
-async function sendNotification(chatId, message) {
-    try {
-        const response = await axios.post(
-            `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
-            {
-                chat_id: chatId,
-                text: message,
-                parse_mode: 'HTML'
-            }
-        );
-        return response.data;
-    } catch (error) {
-        console.error('❌ Ошибка отправки уведомления:', error.message);
-    }
-}
-
 // Маршрут для отправки фото
 app.post('/api/send-photo', async (req, res) => {
     try {
@@ -84,18 +61,10 @@ app.post('/api/send-photo', async (req, res) => {
 
         console.log('📨 Получен запрос на отправку фото от пользователя:', user_id);
 
-        // Проверяем обязательные поля
-        if (!user_id) {
+        if (!user_id || !photo_data) {
             return res.status(400).json({
                 success: false,
-                error: 'User ID is required'
-            });
-        }
-
-        if (!photo_data) {
-            return res.status(400).json({
-                success: false,
-                error: 'Photo data is required'
+                error: 'User ID and photo data are required'
             });
         }
 
@@ -109,9 +78,6 @@ app.post('/api/send-photo', async (req, res) => {
         const result = await sendPhotoToBot(user_id, imageBuffer, caption);
 
         console.log('✅ Фото успешно отправлено! Message ID:', result.result.message_id);
-
-        // Отправляем уведомление о успешной отправке
-        await sendNotification(user_id, '📸 <b>Фото успешно получено!</b>\n\nСпасибо за использование нашего бота!');
 
         res.json({
             success: true,
@@ -130,19 +96,22 @@ app.post('/api/send-photo', async (req, res) => {
     }
 });
 
+// Статические файлы
+app.use(express.static('public'));
+
 // Маршрут для проверки работы сервера
 app.get('/', (req, res) => {
     res.json({
         status: 'Server is running! 🚀',
-        message: 'Telegram Camera Web App Server',
+        message: 'Telegram Camera Web App Server - Deployed on Render',
         endpoints: {
             'GET /': 'Информация о сервере',
             'GET /bot-info': 'Информация о боте',
             'POST /api/send-photo': 'Отправка фото',
-            'GET /health': 'Проверка здоровья сервера'
+            'GET /camera-app.html': 'Web App интерфейс'
         },
-        timestamp: new Date().toISOString(),
-        version: '1.0.0'
+        deploy_url: 'https://your-app.onrender.com',
+        timestamp: new Date().toISOString()
     });
 });
 
@@ -153,14 +122,9 @@ app.get('/bot-info', async (req, res) => {
         
         res.json({
             success: true,
-            bot: {
-                id: response.data.result.id,
-                name: response.data.result.first_name,
-                username: response.data.result.username,
-                is_bot: response.data.result.is_bot
-            },
+            bot: response.data.result,
             bot_url: `https://t.me/${response.data.result.username}`,
-            server_time: new Date().toISOString()
+            server: 'Render.com'
         });
     } catch (error) {
         console.error('❌ Ошибка при проверке бота:', error.response?.data || error.message);
@@ -173,102 +137,18 @@ app.get('/bot-info', async (req, res) => {
     }
 });
 
-// Маршрут для проверки здоровья сервера
-app.get('/health', (req, res) => {
-    res.json({
-        status: 'healthy',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        bot_token_set: BOT_TOKEN && BOT_TOKEN !== '8344281396:AAGZ9-M2XRyPMHiI2akBSSIN7QAtRGDmLOY'
-    });
-});
-
-// Маршрут для тестирования отправки сообщения
-app.get('/test-message', async (req, res) => {
-    try {
-        const chatId = req.query.chat_id;
-        
-        if (!chatId) {
-            return res.status(400).json({
-                success: false,
-                error: 'Добавьте параметр chat_id. Например: /test-message?chat_id=123456789'
-            });
-        }
-
-        const result = await sendNotification(chatId, '🔧 <b>Тестовое сообщение от сервера!</b>\n\nЕсли вы видите это сообщение, сервер работает корректно! ✅');
-
-        res.json({
-            success: true,
-            message: 'Тестовое сообщение отправлено!',
-            result: result
-        });
-
-    } catch (error) {
-        console.error('❌ Ошибка при тестовой отправке:', error.message);
-        
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// Обработка 404 ошибок
-app.use('*', (req, res) => {
-    res.status(404).json({
-        success: false,
-        error: 'Маршрут не найден',
-        available_routes: {
-            'GET /': 'Информация о сервере',
-            'GET /bot-info': 'Информация о боте',
-            'POST /api/send-photo': 'Отправка фото',
-            'GET /health': 'Проверка здоровья',
-            'GET /test-message': 'Тест отправки сообщения'
-        }
-    });
-});
-
-// Глобальная обработка ошибок
-app.use((error, req, res, next) => {
-    console.error('❌ Глобальная ошибка:', error);
-    res.status(500).json({
-        success: false,
-        error: 'Внутренняя ошибка сервера'
-    });
-});
-
 // Запуск сервера
 app.listen(PORT, () => {
     console.log('\n' + '='.repeat(60));
-    console.log('🚀 СЕРВЕР TELEGRAM WEB APP ЗАПУЩЕН!');
+    console.log('🚀 СЕРВЕР ЗАПУЩЕН НА RENDER.COM!');
     console.log('='.repeat(60));
     console.log(`📡 Порт: ${PORT}`);
-    console.log(`🌐 Локальный URL: http://localhost:${PORT}`);
-    console.log(`📊 Статус сервера: http://localhost:${PORT}/`);
-    console.log(`🤖 Инфо о боте: http://localhost:${PORT}/bot-info`);
-    console.log(`❤️  Health check: http://localhost:${PORT}/health`);
+    console.log(`🌐 URL: https://your-app.onrender.com`);
+    console.log(`🤖 Токен настроен: ${!!process.env.BOT_TOKEN}`);
     console.log('='.repeat(60));
-    console.log('📸 Готов к приему фото из Web App!');
-    console.log('='.repeat(60) + '\n');
 });
 
-// Грациозное завершение работы
-process.on('SIGINT', () => {
-    console.log('\n🛑 Сервер останавливается...');
-    process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-    console.log('\n🛑 Сервер получает сигнал завершения...');
-    process.exit(0);
-});
-
+// Обработка ошибок
 process.on('unhandledRejection', (err) => {
     console.error('❌ Необработанное отклонение promise:', err);
-});
-
-process.on('uncaughtException', (err) => {
-    console.error('❌ Необработанное исключение:', err);
-    process.exit(1);
 });
