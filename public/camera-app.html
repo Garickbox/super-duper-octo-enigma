@@ -6,662 +6,173 @@
     <title>Камера для Telegram</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-
-        body {
-            background: #ffffff;
-            color: #212529;
-            line-height: 1.6;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 100%;
-            padding: 15px;
-        }
-
-        header {
-            background: #0088cc;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 15px;
-            border-radius: 0 0 12px 12px;
-            position: relative;
-        }
-
-        h1 {
-            font-size: 1.4rem;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #0088cc;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            justify-content: center;
-            margin: 5px 0;
-            font-size: 16px;
-        }
-
-        .btn:hover {
-            background: #006699;
-            transform: translateY(-1px);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-success {
-            background: #4cc9f0;
-        }
-
-        .btn-danger {
-            background: #f72585;
-        }
-
-        .btn-warning {
-            background: #ffb703;
-        }
-
-        .camera-preview {
-            width: 100%;
-            height: 300px;
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-            margin-bottom: 15px;
-            border: 2px solid #e9ecef;
-        }
-
-        .camera-preview video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .captured-image {
-            width: 100%;
-            height: 300px;
-            object-fit: contain;
-            background: #000;
-            border-radius: 12px;
-            display: none;
-        }
-
-        .status-message {
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 12px;
-            text-align: center;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .status-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .status-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .photo-preview {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .preview-image {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 12px;
-            border: 2px solid #e9ecef;
-        }
-
-        #cameraInfo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            text-align: center;
-            background: rgba(0,0,0,0.7);
-            padding: 20px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-
-        .camera-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .caption-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        .caption-input:focus {
-            outline: none;
-            border-color: #0088cc;
-        }
-
-        .back-button {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(0,0,0,0.5);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-
-        .debug-info {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 10px;
-        }
-
-        @media (min-width: 768px) {
-            .container {
-                max-width: 500px;
-                margin: 0 auto;
-            }
-            
-            .camera-preview {
-                height: 400px;
-            }
-            
-            .captured-image {
-                height: 400px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .card {
-                padding: 15px;
-            }
-            
-            .btn {
-                padding: 10px 16px;
-                font-size: 14px;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui; }
+        body { background: #fff; padding: 15px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        header { background: #0088cc; color: white; padding: 15px; text-align: center; border-radius: 12px; margin-bottom: 15px; }
+        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .btn { background: #0088cc; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; margin: 5px 0; font-size: 16px; cursor: pointer; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .camera-preview { width: 100%; height: 300px; background: #000; border-radius: 12px; position: relative; margin-bottom: 15px; }
+        .camera-preview video { width: 100%; height: 100%; object-fit: cover; }
+        #cameraInfo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 8px; text-align: center; }
+        .success { background: #d4ffd4; color: #006400; }
+        .error { background: #ffd4d4; color: #640000; }
+        .info { background: #d4eaff; color: #004064; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <button class="back-button" onclick="goBack()" style="display: none;">←</button>
             <h1>📷 Камера в Telegram</h1>
-            <p class="subtitle">Сфотографируйте и отправьте боту</p>
+            <p>Тестовый режим (User ID: 1189539923)</p>
         </header>
 
         <div class="card">
-            <div class="camera-preview" id="cameraPreview">
+            <div class="camera-preview">
                 <video id="videoElement" autoplay playsinline></video>
                 <div id="cameraInfo">
-                    <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
-                    <div>Камера не активирована</div>
-                    <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Нажмите "Включить камеру"</div>
+                    <div style="font-size: 48px;">📷</div>
+                    <div>Нажмите "Включить камеру"</div>
                 </div>
             </div>
             
-            <img id="capturedImage" class="captured-image">
-            
-            <div class="camera-controls">
-                <button class="btn btn-success" id="startCameraBtn">
-                    📷 Включить камеру
-                </button>
-                <button class="btn" id="captureBtn" disabled>
-                    📸 Сделать снимок
-                </button>
-                <button class="btn btn-danger" id="stopCameraBtn" disabled>
-                    ⏹️ Выключить камеру
-                </button>
-            </div>
+            <button class="btn" id="startCameraBtn">📷 Включить камеру</button>
+            <button class="btn" id="captureBtn" disabled>📸 Сделать снимок</button>
+            <button class="btn" id="stopCameraBtn" disabled>⏹️ Выключить камеру</button>
         </div>
 
         <div class="card" id="photoPreviewCard" style="display: none;">
-            <div class="photo-preview">
-                <h3 style="margin-bottom: 10px;">Предпросмотр фото</h3>
-                <img id="previewImage" class="preview-image">
-                <input type="text" id="photoCaption" class="caption-input" placeholder="Добавьте подпись к фото (необязательно)" maxlength="200">
-                <button class="btn btn-success" id="sendToBotBtn">
-                    ✈️ Отправить боту
-                </button>
-                <button class="btn btn-warning" id="retakePhotoBtn">
-                    🔄 Переснять фото
-                </button>
-            </div>
+            <h3>Предпросмотр фото</h3>
+            <img id="previewImage" style="width: 100%; border-radius: 8px; margin: 10px 0;">
+            <input type="text" id="photoCaption" placeholder="Подпись (необязательно)" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px;">
+            <button class="btn" id="sendToBotBtn">✈️ Отправить боту</button>
+            <button class="btn" id="retakePhotoBtn">🔄 Переснять фото</button>
         </div>
 
         <div id="statusMessage"></div>
-
-        <div class="debug-info" id="debugInfo" style="display: none;">
-            <strong>Отладочная информация:</strong>
-            <div id="debugContent"></div>
-        </div>
     </div>
 
     <script>
-        // Инициализация Telegram Web App
-        const tg = window.Telegram.WebApp;
+        const SERVER_URL = 'https://telegram-camera-bot-production.up.railway.app/api/send-photo';
+        const YOUR_USER_ID = 1189539923; // Ваш ID
         
-        // Глобальные переменные
         let mediaStream = null;
         let currentPhotoData = null;
-        
-        // URL вашего сервера на Railway
-        const SERVER_URL = 'https://telegram-camera-bot-production.up.railway.app/api/send-photo';
-        
-        // Инициализация при загрузке страницы
+
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Telegram Web App инициализирован');
-            
-            // Инициализируем Telegram Web App
-            tg.expand();
-            tg.enableClosingConfirmation();
-            
-            // Показываем отладочную информацию
-            showDebugInfo();
-            
-            // Назначаем обработчики событий
             document.getElementById('startCameraBtn').addEventListener('click', initializeCamera);
             document.getElementById('captureBtn').addEventListener('click', captureImage);
             document.getElementById('stopCameraBtn').addEventListener('click', stopCamera);
             document.getElementById('sendToBotBtn').addEventListener('click', sendPhotoToBot);
             document.getElementById('retakePhotoBtn').addEventListener('click', retakePhoto);
             
-            // Показываем информацию о пользователе
-            showUserInfo();
-            
-            // Проверяем доступность камеры
-            checkCameraSupport();
+            showStatus('🔧 Тестовый режим активен\nUser ID: ' + YOUR_USER_ID, 'info');
         });
-        
-        // Показать информацию о пользователе
-        function showUserInfo() {
-            const user = tg.initDataUnsafe?.user;
-            if (user) {
-                const userName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-                document.getElementById('cameraInfo').innerHTML = `
-                    <div style="font-size: 48px; margin-bottom: 10px;">👋</div>
-                    <div>Привет, ${userName}!</div>
-                    <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Нажмите "Включить камеру" чтобы начать</div>
-                `;
-            }
-        }
-        
-        // Проверка поддержки камеры
-        function checkCameraSupport() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                showStatus('Ваш браузер не поддерживает доступ к камере', 'error');
-                document.getElementById('startCameraBtn').disabled = true;
-            }
-        }
-        
-        // Инициализация камеры
+
         async function initializeCamera() {
             try {
                 showStatus('Запрос доступа к камере...', 'info');
+                if (mediaStream) stopCamera();
                 
-                // Останавливаем предыдущий поток, если есть
-                if (mediaStream) {
-                    stopCamera();
-                }
+                mediaStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" } 
+                });
                 
-                // Запрос доступа к камере
-                const constraints = {
-                    video: { 
-                        facingMode: "environment", // Задняя камера
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    } 
-                };
+                const video = document.getElementById('videoElement');
+                video.srcObject = mediaStream;
                 
-                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-                
-                const videoElement = document.getElementById('videoElement');
-                videoElement.srcObject = mediaStream;
-                
-                // Ждем пока видео готово
-                videoElement.onloadedmetadata = () => {
-                    // Обновляем информацию о камере
+                video.onloadedmetadata = () => {
                     document.getElementById('cameraInfo').style.display = 'none';
-                    
-                    // Активируем кнопки
                     document.getElementById('startCameraBtn').disabled = true;
                     document.getElementById('captureBtn').disabled = false;
                     document.getElementById('stopCameraBtn').disabled = false;
-                    
-                    showStatus('✅ Камера успешно активирована', 'success');
-                    updateDebugInfo('Камера', 'Активирована');
+                    showStatus('✅ Камера активирована', 'success');
                 };
-                
             } catch (error) {
-                console.error('Ошибка доступа к камере:', error);
-                let errorMessage = 'Не удалось получить доступ к камере. ';
-                
-                if (error.name === 'NotAllowedError') {
-                    errorMessage += 'Разрешите доступ к камере в настройках браузера.';
-                } else if (error.name === 'NotFoundError') {
-                    errorMessage += 'Камера не найдена на устройстве.';
-                } else if (error.name === 'NotSupportedError') {
-                    errorMessage += 'Ваш браузер не поддерживает эту функциональность.';
-                } else {
-                    errorMessage += 'Проверьте разрешения и попробуйте снова.';
-                }
-                
-                showStatus(errorMessage, 'error');
-                updateDebugInfo('Ошибка камеры', error.name);
+                showStatus('❌ Ошибка доступа к камере', 'error');
             }
         }
-        
-        // Снимок с камеры
+
         function captureImage() {
-            const videoElement = document.getElementById('videoElement');
-            const capturedImage = document.getElementById('capturedImage');
-            const previewImage = document.getElementById('previewImage');
-            
-            // Создаем canvas для захвата кадра
+            const video = document.getElementById('videoElement');
             const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
             
-            // Устанавливаем размеры canvas как у видео
-            canvas.width = videoElement.videoWidth;
-            canvas.height = videoElement.videoHeight;
-            
-            // Рисуем текущий кадр видео на canvas
-            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-            
-            // Сохраняем изображение в формате Data URL (сжатое JPEG, качество 80%)
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
             currentPhotoData = canvas.toDataURL('image/jpeg', 0.8);
             
-            // Показываем превью
-            capturedImage.src = currentPhotoData;
-            capturedImage.style.display = 'block';
-            previewImage.src = currentPhotoData;
-            
-            // Скрываем видео, показываем превью
-            videoElement.style.display = 'none';
+            document.getElementById('previewImage').src = currentPhotoData;
+            video.style.display = 'none';
             document.getElementById('photoPreviewCard').style.display = 'block';
             
-            // Показываем кнопку назад
-            document.querySelector('.back-button').style.display = 'flex';
-            
             showStatus('✅ Фото готово к отправке', 'success');
-            updateDebugInfo('Фото', 'Снято и готово к отправке');
         }
-        
-        // Переснять фото
+
         function retakePhoto() {
-            const videoElement = document.getElementById('videoElement');
-            const capturedImage = document.getElementById('capturedImage');
-            
-            // Скрываем превью, показываем видео
-            capturedImage.style.display = 'none';
-            videoElement.style.display = 'block';
+            document.getElementById('videoElement').style.display = 'block';
             document.getElementById('photoPreviewCard').style.display = 'none';
-            
-            // Скрываем кнопку назад
-            document.querySelector('.back-button').style.display = 'none';
-            
-            // Очищаем подпись
             document.getElementById('photoCaption').value = '';
-            
             currentPhotoData = null;
-            showStatus('Сделайте новый снимок', 'info');
-            updateDebugInfo('Фото', 'Пересъемка');
         }
-        
-        // Остановка камеры
+
         function stopCamera() {
             if (mediaStream) {
                 mediaStream.getTracks().forEach(track => track.stop());
                 mediaStream = null;
             }
-            
-            const videoElement = document.getElementById('videoElement');
-            videoElement.srcObject = null;
-            
-            // Деактивируем кнопки
+            document.getElementById('videoElement').srcObject = null;
             document.getElementById('startCameraBtn').disabled = false;
             document.getElementById('captureBtn').disabled = true;
             document.getElementById('stopCameraBtn').disabled = true;
-            
-            // Сбрасываем отображение
             document.getElementById('cameraInfo').style.display = 'block';
-            document.getElementById('cameraInfo').innerHTML = `
-                <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
-                <div>Камера не активирована</div>
-                <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Нажмите "Включить камеру"</div>
-            `;
-            
-            // Скрываем кнопку назад
-            document.querySelector('.back-button').style.display = 'none';
-            
-            showStatus('Камера выключена', 'info');
-            updateDebugInfo('Камера', 'Выключена');
         }
-        
-        // Отправка фото боту
+
+        // ⭐ САМАЯ ВАЖНАЯ ФУНКЦИЯ - УЛЬТРА-ПРОСТАЯ
         async function sendPhotoToBot() {
             if (!currentPhotoData) {
                 showStatus('❌ Нет фото для отправки', 'error');
                 return;
             }
             
-            showStatus('📤 Отправка фото боту...', 'info');
-            
-            // Получаем user_id из Telegram Web App
-            const user = tg.initDataUnsafe?.user;
-            if (!user) {
-                showStatus('❌ Ошибка: не удалось определить пользователя', 'error');
-                return;
-            }
-            
-            const caption = document.getElementById('photoCaption').value;
-            
-            // Блокируем кнопку отправки
+            showStatus('📤 Отправка фото...', 'info');
             document.getElementById('sendToBotBtn').disabled = true;
             document.getElementById('sendToBotBtn').innerHTML = '⏳ Отправка...';
             
             try {
-                // Отправляем на сервер
-                const result = await sendPhotoToServer(currentPhotoData, user.id, caption);
+                // ВСЕГДА используем ваш ID
+                const result = await fetch(SERVER_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: YOUR_USER_ID, // ⭐ ВАШ ID
+                        photo_data: currentPhotoData,
+                        caption: document.getElementById('photoCaption').value
+                    })
+                }).then(r => r.json());
                 
                 if (result.success) {
-                    showStatus('✅ Фото успешно отправлено боту!', 'success');
-                    updateDebugInfo('Отправка', 'Успешно');
-                    
-                    // Закрываем приложение через 2 секунды
-                    setTimeout(() => {
-                        tg.close();
-                    }, 2000);
+                    showStatus('✅ Фото отправлено!\n(на User ID: ' + YOUR_USER_ID + ')', 'success');
                 } else {
-                    showStatus('❌ Ошибка отправки фото: ' + result.error, 'error');
-                    updateDebugInfo('Ошибка отправки', result.error);
+                    showStatus('❌ Ошибка: ' + result.error, 'error');
                 }
             } catch (error) {
-                console.error('Ошибка отправки фото:', error);
-                showStatus('❌ Ошибка отправки фото: ' + error.message, 'error');
-                updateDebugInfo('Ошибка сети', error.message);
+                showStatus('❌ Ошибка сети: ' + error.message, 'error');
             } finally {
-                // Разблокируем кнопку отправки
                 document.getElementById('sendToBotBtn').disabled = false;
                 document.getElementById('sendToBotBtn').innerHTML = '✈️ Отправить боту';
             }
         }
-        
-        // Отправка фото на сервер
-        async function sendPhotoToServer(photoData, userId, caption = '') {
-            const response = await fetch(SERVER_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    user_id: userId,
-                    photo_data: photoData,
-                    caption: caption
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            return await response.json();
-        }
-        
-        // Назад к главной
-        function goBack() {
-            window.location.href = 'index.html';
-        }
-        
-        // Показать статус
+
         function showStatus(message, type) {
-            const statusElement = document.getElementById('statusMessage');
-            statusElement.textContent = message;
-            statusElement.className = 'status-message';
-            
-            // Добавляем класс в зависимости от типа
-            if (type === 'success') {
-                statusElement.classList.add('status-success');
-            } else if (type === 'error') {
-                statusElement.classList.add('status-error');
-            } else if (type === 'warning') {
-                statusElement.classList.add('status-warning');
-            } else if (type === 'info') {
-                statusElement.classList.add('status-info');
-            }
-            
-            // Автоматически скрыть через 5 секунд (кроме ошибок)
-            if (type !== 'error') {
-                setTimeout(() => {
-                    if (statusElement.textContent === message) {
-                        statusElement.textContent = '';
-                        statusElement.className = '';
-                    }
-                }, 5000);
-            }
+            const el = document.getElementById('statusMessage');
+            el.textContent = message;
+            el.className = 'status ' + type;
+            setTimeout(() => el.textContent = '', 5000);
         }
-        
-        // Показать отладочную информацию
-        function showDebugInfo() {
-            const user = tg.initDataUnsafe?.user;
-            const debugInfo = `
-                User ID: ${user?.id || 'N/A'}<br>
-                Platform: ${tg.platform || 'N/A'}<br>
-                Color Scheme: ${tg.colorScheme || 'N/A'}<br>
-                Viewport: ${tg.viewportHeight} x ${tg.viewportWidth}<br>
-                Backend URL: ${SERVER_URL}<br>
-                Init Data: ${tg.initData ? 'Yes' : 'No'}
-            `;
-            
-            document.getElementById('debugContent').innerHTML = debugInfo;
-            document.getElementById('debugInfo').style.display = 'block';
-        }
-        
-        // Обновить отладочную информацию
-        function updateDebugInfo(key, value) {
-            const debugContent = document.getElementById('debugContent');
-            const currentContent = debugContent.innerHTML;
-            const newEntry = `${key}: ${value}`;
-            
-            // Добавляем новую запись в начало
-            debugContent.innerHTML = newEntry + '<br>' + currentContent.split('<br>').slice(0, 5).join('<br>');
-        }
-        
-        // Обработка ошибок
-        window.addEventListener('error', function(e) {
-            console.error('Global error:', e.error);
-            updateDebugInfo('Global Error', e.error.message);
-        });
-        
-        // Обработка отклоненных промисов
-        window.addEventListener('unhandledrejection', function(e) {
-            console.error('Unhandled promise rejection:', e.reason);
-            updateDebugInfo('Promise Rejection', e.reason.message);
-        });
     </script>
 </body>
 </html>
