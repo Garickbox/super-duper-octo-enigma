@@ -1,35 +1,241 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>CORS Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test - Telegram Camera Bot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: #0088cc;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .btn {
+            background: #0088cc;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #006699;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .result {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .success {
+            background: #d4ffd4;
+            color: #006400;
+            border: 1px solid #006400;
+        }
+        
+        .error {
+            background: #ffd4d4;
+            color: #640000;
+            border: 1px solid #640000;
+        }
+        
+        .info {
+            background: #d4eaff;
+            color: #004064;
+            border: 1px solid #004064;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            margin: 10px 0;
+            align-items: center;
+        }
+        
+        .url {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+    </style>
 </head>
 <body>
-    <h1>CORS Test for Telegram Camera Bot</h1>
-    <button onclick="testCORS()">Test CORS</button>
-    <div id="result"></div>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Тестирование CORS</h1>
+            <p>Проверка подключения к бэкенду Telegram Camera Bot</p>
+        </div>
+        
+        <div class="card">
+            <h3>🌐 Информация о подключении</h3>
+            <p><strong>Backend URL:</strong> <code>https://telegram-camera-bot-production.up.railway.app</code></p>
+            <p><strong>Frontend URL:</strong> <code id="frontendUrl">Загрузка...</code></p>
+            <p><strong>User ID:</strong> <code>1189539923</code></p>
+            
+            <div style="margin: 20px 0;">
+                <button class="btn" onclick="testAllEndpoints()">🧪 Протестировать все endpoints</button>
+                <button class="btn btn-secondary" onclick="clearResults()">🗑️ Очистить результаты</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>📡 Доступные endpoints для тестирования</h3>
+            
+            <div class="test-grid">
+                <div class="url">GET /</div>
+                <button class="btn" onclick="testEndpoint('/')">Тестировать</button>
+            </div>
+            
+            <div class="test-grid">
+                <div class="url">GET /api/bot-status</div>
+                <button class="btn" onclick="testEndpoint('/api/bot-status')">Тестировать</button>
+            </div>
+            
+            <div class="test-grid">
+                <div class="url">GET /api/stats</div>
+                <button class="btn" onclick="testEndpoint('/api/stats')">Тестировать</button>
+            </div>
+            
+            <div class="test-grid">
+                <div class="url">GET /api/logs</div>
+                <button class="btn" onclick="testEndpoint('/api/logs')">Тестировать</button>
+            </div>
+            
+            <div class="test-grid">
+                <div class="url">GET /api/test</div>
+                <button class="btn" onclick="testEndpoint('/api/test')">Тестировать</button>
+            </div>
+            
+            <div class="test-grid">
+                <div class="url">POST /api/send-photo</div>
+                <button class="btn" onclick="testPhotoEndpoint()">Тестировать</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>📊 Результаты тестирования</h3>
+            <div id="results">
+                <div class="result info">
+                    Нажмите кнопку "Протестировать все endpoints" для начала проверки
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        async function testCORS() {
-            const urls = [
-                'https://telegram-camera-bot-production.up.railway.app/',
-                'https://telegram-camera-bot-production.up.railway.app/api/bot-status',
-                'https://telegram-camera-bot-production.up.railway.app/api/stats',
-                'https://telegram-camera-bot-production.up.railway.app/api/logs'
-            ];
-
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '';
-
-            for (const url of urls) {
-                try {
-                    const response = await fetch(url, { mode: 'cors' });
+        const BACKEND_URL = 'https://telegram-camera-bot-production.up.railway.app';
+        
+        // Показываем текущий URL фронтенда
+        document.getElementById('frontendUrl').textContent = window.location.origin;
+        
+        function addResult(message, type = 'info') {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            document.getElementById('results').appendChild(resultDiv);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '<div class="result info">Результаты очищены</div>';
+        }
+        
+        async function testEndpoint(endpoint) {
+            const url = BACKEND_URL + endpoint;
+            const startTime = Date.now();
+            
+            addResult(`🔍 Тестирование: ${url}`, 'info');
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const duration = Date.now() - startTime;
+                
+                if (response.ok) {
                     const data = await response.json();
-                    resultDiv.innerHTML += `<div style="color: green;">✅ ${url} - SUCCESS</div>`;
-                } catch (error) {
-                    resultDiv.innerHTML += `<div style="color: red;">❌ ${url} - ERROR: ${error.message}</div>`;
+                    addResult(`✅ УСПЕХ: ${endpoint} (${duration}ms)\nСтатус: ${data.status || 'OK'}\nCORS: Работает`, 'success');
+                } else {
+                    addResult(`❌ ОШИБКА: ${endpoint} - HTTP ${response.status}: ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                const duration = Date.now() - startTime;
+                addResult(`❌ ОШИБКА: ${endpoint} (${duration}ms)\n${error.message}`, 'error');
+                
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    addResult('⚠️ ВОЗМОЖНА CORS ОШИБКА: Проверьте настройки CORS на сервере', 'error');
                 }
             }
         }
-    </script>
-</body>
-</html>
+        
+        async function testPhotoEndpoint() {
+            const url = BACKEND_URL + '/api/send-photo';
+            const startTime = Date.now();
+            
+            addResult(`🔍 Тестирование: ${url}`, 'info');
+            
+            // Создаем тестовые base64 данные (маленькое красное изображение 1x1 пиксель)
+            const testImageData = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=';
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: 118
