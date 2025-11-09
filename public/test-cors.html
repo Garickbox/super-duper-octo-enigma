@@ -14,54 +14,51 @@
         
         body {
             background: #f5f5f5;
-            padding: 20px;
+            padding: 15px;
             color: #333;
+            line-height: 1.5;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         
         .header {
             background: #0088cc;
             color: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
             text-align: center;
         }
         
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
         }
         
         .btn {
             background: #0088cc;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 5px;
-            font-size: 16px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
         }
         
         .btn:hover {
             background: #006699;
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-        }
-        
-        .btn-secondary:hover {
-            background: #545b62;
+            transform: translateY(-1px);
         }
         
         .btn-success {
@@ -89,151 +86,206 @@
             background: #c82333;
         }
         
-        .result {
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .card {
+            background: white;
             padding: 15px;
             border-radius: 8px;
-            margin: 10px 0;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result {
+            padding: 12px;
+            border-radius: 6px;
+            margin: 8px 0;
             font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             white-space: pre-wrap;
             word-break: break-all;
+            border-left: 4px solid;
         }
         
         .success {
-            background: #d4ffd4;
-            color: #006400;
-            border: 1px solid #006400;
+            background: #f8fff8;
+            color: #2d5016;
+            border-left-color: #28a745;
         }
         
         .error {
-            background: #ffd4d4;
-            color: #640000;
-            border: 1px solid #640000;
+            background: #fff8f8;
+            color: #8b0000;
+            border-left-color: #dc3545;
         }
         
         .info {
-            background: #d4eaff;
+            background: #f0f8ff;
             color: #004064;
-            border: 1px solid #004064;
+            border-left-color: #0088cc;
         }
         
         .warning {
-            background: #fff3cd;
+            background: #fffbf0;
             color: #856404;
-            border: 1px solid #856404;
+            border-left-color: #ffc107;
         }
         
         .test-grid {
             display: grid;
             grid-template-columns: 1fr auto;
-            gap: 10px;
-            margin: 10px 0;
+            gap: 8px;
+            margin: 8px 0;
             align-items: center;
         }
         
         .url {
             font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             background: #f8f9fa;
-            padding: 8px;
+            padding: 6px;
             border-radius: 4px;
             word-break: break-all;
         }
         
-        .test-section {
-            margin: 20px 0;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: #e9ecef;
-            border-radius: 10px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: #0088cc;
-            transition: width 0.3s ease;
-            width: 0%;
+        .compact-btn {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            min-width: 80px;
         }
         
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin: 15px 0;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin: 12px 0;
         }
         
         .stat-item {
             background: white;
-            padding: 10px;
+            padding: 8px;
             border-radius: 6px;
             text-align: center;
             border: 1px solid #dee2e6;
         }
         
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
-            margin: 5px 0;
+            margin: 3px 0;
         }
         
         .stat-label {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #6c757d;
         }
         
         .connection-info {
             background: #e7f3ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            font-size: 0.9rem;
         }
         
         .timestamp {
             color: #6c757d;
             font-size: 0.7rem;
+            display: block;
+            margin-bottom: 5px;
         }
         
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #0088cc;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #0088cc;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            vertical-align: middle;
         }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .section-title {
+            margin: 15px 0 10px 0;
+            font-size: 1.1rem;
+            color: #0088cc;
+        }
+        
+        .debug-section {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 0.8rem;
+        }
+        
+        .results-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 10px;
+            background: #f8f9fa;
+        }
+        
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                min-width: 100%;
+            }
+            
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔧 Тестирование CORS и API</h1>
-            <p>Комплексная проверка подключения к бэкенду Telegram Camera Bot</p>
-            <div style="margin-top: 10px; font-size: 0.9rem;">
+            <h1 style="margin: 0; font-size: 1.3rem;">🔧 Тестирование CORS и API</h1>
+            <p style="margin: 5px 0; font-size: 0.9rem; opacity: 0.9;">Комплексная проверка подключения к бэкенду Telegram Camera Bot</p>
+            <div style="margin-top: 8px; font-size: 0.8rem;">
                 👤 Александр Горчаков | 🆔 1189539923
             </div>
         </div>
+
+        <!-- Навигация -->
+        <div class="nav-buttons">
+            <a href="index.html" class="btn btn-secondary">🏠 На главную</a>
+            <a href="camera-app.html" class="btn">📷 Камера</a>
+            <button class="btn btn-success" onclick="testAllEndpoints()">🧪 Полный тест</button>
+            <button class="btn" onclick="testBasicConnection()">🔗 Базовое подключение</button>
+            <button class="btn btn-secondary" onclick="clearResults()">🗑️ Очистить логи</button>
+            <button class="btn btn-secondary" onclick="exportResults()">💾 Экспорт логов</button>
+        </div>
         
         <div class="card">
-            <h3>🌐 Информация о подключении</h3>
+            <h3 style="margin: 0 0 10px 0;">🌐 Информация о подключении</h3>
             <div class="connection-info">
                 <p><strong>Backend URL:</strong> <code id="backendUrl">https://telegram-camera-bot-production.up.railway.app</code></p>
                 <p><strong>Frontend URL:</strong> <code id="frontendUrl">Загрузка...</code></p>
                 <p><strong>User ID:</strong> <code>1189539923</code></p>
-                <p><strong>Текущее время:</strong> <span id="currentTime"></span></p>
                 <p><strong>Статус CORS:</strong> <span id="corsStatus">Проверка...</span></p>
             </div>
             
@@ -255,87 +307,69 @@
                     <div class="stat-value warning" id="testsCors">0</div>
                 </div>
             </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin: 0 0 15px 0;">📡 Endpoints для тестирования</h3>
             
-            <div style="margin: 20px 0;">
-                <button class="btn btn-success" onclick="testAllEndpoints()">🧪 Протестировать все endpoints</button>
-                <button class="btn" onclick="testBasicConnection()">🔗 Тест базового подключения</button>
-                <button class="btn btn-warning" onclick="testCorsPreflight()">🔄 Тест CORS Preflight</button>
-                <button class="btn btn-danger" onclick="testWithoutCors()">🚫 Тест без CORS</button>
-                <button class="btn btn-secondary" onclick="clearResults()">🗑️ Очистить результаты</button>
+            <div class="section-title">🔍 Основные endpoints</div>
+            <div class="test-grid">
+                <div class="url">GET /</div>
+                <button class="btn compact-btn" onclick="testEndpoint('/', 'GET')">Тест</button>
             </div>
             
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressBar"></div>
+            <div class="test-grid">
+                <div class="url">GET /api/bot-status</div>
+                <button class="btn compact-btn" onclick="testEndpoint('/api/bot-status', 'GET')">Тест</button>
+            </div>
+            
+            <div class="test-grid">
+                <div class="url">GET /api/stats</div>
+                <button class="btn compact-btn" onclick="testEndpoint('/api/stats', 'GET')">Тест</button>
+            </div>
+            
+            <div class="test-grid">
+                <div class="url">GET /api/logs</div>
+                <button class="btn compact-btn" onclick="testEndpoint('/api/logs', 'GET')">Тест</button>
+            </div>
+            
+            <div class="test-grid">
+                <div class="url">GET /api/test</div>
+                <button class="btn compact-btn" onclick="testEndpoint('/api/test', 'GET')">Тест</button>
+            </div>
+
+            <div class="section-title">📤 Endpoints для отправки данных</div>
+            <div class="test-grid">
+                <div class="url">POST /api/send-photo</div>
+                <button class="btn compact-btn" onclick="testPhotoEndpoint()">Тест</button>
+            </div>
+            
+            <div class="test-grid">
+                <div class="url">POST /api/test-base64</div>
+                <button class="btn compact-btn" onclick="testBase64Endpoint()">Тест</button>
             </div>
         </div>
         
         <div class="card">
-            <h3>📡 Доступные endpoints для тестирования</h3>
-            
-            <div class="test-section">
-                <h4>🔍 Основные endpoints</h4>
-                <div class="test-grid">
-                    <div class="url">GET /</div>
-                    <button class="btn" onclick="testEndpoint('/', 'GET')">Тестировать</button>
-                </div>
-                
-                <div class="test-grid">
-                    <div class="url">GET /api/bot-status</div>
-                    <button class="btn" onclick="testEndpoint('/api/bot-status', 'GET')">Тестировать</button>
-                </div>
-                
-                <div class="test-grid">
-                    <div class="url">GET /api/stats</div>
-                    <button class="btn" onclick="testEndpoint('/api/stats', 'GET')">Тестировать</button>
-                </div>
-                
-                <div class="test-grid">
-                    <div class="url">GET /api/logs</div>
-                    <button class="btn" onclick="testEndpoint('/api/logs', 'GET')">Тестировать</button>
-                </div>
-                
-                <div class="test-grid">
-                    <div class="url">GET /api/test</div>
-                    <button class="btn" onclick="testEndpoint('/api/test', 'GET')">Тестировать</button>
-                </div>
+            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin: 0;">📊 Результаты тестирования</h3>
+                <button class="btn compact-btn" onclick="toggleDebug()">🐛 Debug</button>
             </div>
             
-            <div class="test-section">
-                <h4>📤 Endpoints для отправки данных</h4>
-                <div class="test-grid">
-                    <div class="url">POST /api/send-photo</div>
-                    <button class="btn" onclick="testPhotoEndpoint()">Тестировать</button>
+            <div class="results-container" id="resultsContainer">
+                <div id="results">
+                    <div class="result info">
+                        Готов к тестированию! Нажмите "Базовое подключение" для начала проверки.
+                    </div>
                 </div>
-                
-                <div class="test-grid">
-                    <div class="url">POST /api/test-base64</div>
-                    <button class="btn" onclick="testBase64Endpoint()">Тестировать</button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h3>📊 Результаты тестирования</h3>
-            <div id="results">
-                <div class="result info">
-                    Готов к тестированию! Нажмите кнопку "Тест базового подключения" для начала проверки.
-                    
-                    Тестируемые домены:
-                    - Backend: https://telegram-camera-bot-production.up.railway.app
-                    - Frontend: <span id="currentOrigin">определяется автоматически</span>
-                </div>
-            </div>
-            
-            <div style="margin-top: 15px;">
-                <button class="btn btn-secondary" onclick="exportResults()">💾 Экспорт результатов</button>
-                <button class="btn btn-secondary" onclick="showTechnicalInfo()">🔧 Техническая информация</button>
-                <button class="btn btn-secondary" onclick="showDebugInfo()">🐛 Debug информация</button>
             </div>
         </div>
 
         <div class="card" id="debugSection" style="display: none;">
-            <h3>🐛 Debug информация</h3>
-            <div id="debugInfo"></div>
+            <h3 style="margin: 0 0 10px 0;">🐛 Debug информация</h3>
+            <div class="debug-section" id="debugInfo">
+                Загрузка debug информации...
+            </div>
         </div>
     </div>
 
@@ -350,18 +384,16 @@
         
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            // Показываем текущий URL фронтенда и время
+            // Показываем текущий URL фронтенда
             document.getElementById('frontendUrl').textContent = window.location.origin;
-            document.getElementById('currentOrigin').textContent = window.location.origin;
             updateCurrentTime();
             
             // Автоматически проверяем базовое подключение
-            setTimeout(testBasicConnection, 1000);
+            setTimeout(testBasicConnection, 500);
         });
         
         function updateCurrentTime() {
-            document.getElementById('currentTime').textContent = new Date().toLocaleString('ru-RU');
-            setTimeout(updateCurrentTime, 1000);
+            setTimeout(updateCurrentTime, 60000); // Обновляем раз в минуту
         }
         
         function updateStats() {
@@ -369,9 +401,6 @@
             document.getElementById('testsSuccess').textContent = testResults.success;
             document.getElementById('testsError').textContent = testResults.error;
             document.getElementById('testsCors').textContent = testResults.corsErrors;
-            
-            const progress = (testResults.completed / 8) * 100; // 8 тестов всего
-            document.getElementById('progressBar').style.width = progress + '%';
         }
         
         function addResult(message, type = 'info') {
@@ -380,7 +409,10 @@
             resultDiv.className = `result ${type}`;
             resultDiv.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
             document.getElementById('results').appendChild(resultDiv);
-            resultDiv.scrollIntoView({ behavior: 'smooth' });
+            
+            // Авто-скролл к новому результату
+            const container = document.getElementById('resultsContainer');
+            container.scrollTop = container.scrollHeight;
             
             // Обновляем статистику
             if (type === 'success') testResults.success++;
@@ -390,9 +422,9 @@
             updateStats();
         }
 
-        function showLoading(button) {
+        function showLoading(button, text = 'Загрузка...') {
             const originalText = button.innerHTML;
-            button.innerHTML = '<div class="loading"></div> Загрузка...';
+            button.innerHTML = `<div class="loading"></div> ${text}`;
             button.disabled = true;
             return () => {
                 button.innerHTML = originalText;
@@ -401,7 +433,7 @@
         }
         
         function clearResults() {
-            document.getElementById('results').innerHTML = '<div class="result info">Результаты очищены</div>';
+            document.getElementById('results').innerHTML = '<div class="result info">Логи очищены</div>';
             testResults = { completed: 0, success: 0, error: 0, corsErrors: 0 };
             updateStats();
         }
@@ -410,7 +442,7 @@
             const url = BACKEND_URL + '/';
             const startTime = Date.now();
             
-            addResult(`🔍 Тестирование базового подключения: GET ${url}`, 'info');
+            addResult(`Тестирование базового подключения: GET ${url}`, 'info');
             document.getElementById('corsStatus').innerHTML = '<div class="loading"></div> Проверка...';
             
             try {
@@ -418,6 +450,7 @@
                     method: 'GET',
                     mode: 'cors',
                     headers: {
+                        'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     }
                 });
@@ -425,25 +458,34 @@
                 const duration = Date.now() - startTime;
                 
                 if (response.ok) {
-                    const data = await response.json();
-                    document.getElementById('corsStatus').innerHTML = '✅ CORS работает';
-                    document.getElementById('corsStatus').style.color = 'green';
-                    addResult(`✅ УСПЕХ: Базовое подключение (${duration}ms)\nСтатус: ${data.status || 'OK'}\nCORS: ✅ Работает\nПользователь: ${data.user || 'Unknown'}`, 'success');
+                    const contentType = response.headers.get('content-type');
+                    
+                    if (contentType && contentType.includes('application/json')) {
+                        const data = await response.json();
+                        document.getElementById('corsStatus').innerHTML = '✅ CORS работает';
+                        addResult(`✅ УСПЕХ: Базовое подключение (${duration}ms)\nСтатус: ${data.status || 'OK'}\nПользователь: ${data.user || 'Unknown'}`, 'success');
+                    } else {
+                        // Сервер возвращает HTML вместо JSON
+                        const text = await response.text();
+                        document.getElementById('corsStatus').innerHTML = '⚠️ Сервер возвращает HTML';
+                        addResult(`⚠️ ПРЕДУПРЕЖДЕНИЕ: Сервер возвращает HTML вместо JSON (${duration}ms)\nЭто может быть страница ошибки или редирект\nПроверьте URL сервера`, 'warning');
+                    }
                 } else {
                     document.getElementById('corsStatus').innerHTML = '❌ Ошибка подключения';
-                    document.getElementById('corsStatus').style.color = 'red';
                     addResult(`❌ ОШИБКА: HTTP ${response.status}: ${response.statusText}`, 'error');
                 }
             } catch (error) {
                 const duration = Date.now() - startTime;
                 document.getElementById('corsStatus').innerHTML = '❌ CORS ошибка';
-                document.getElementById('corsStatus').style.color = 'red';
                 
-                addResult(`❌ ОШИБКА: Не удалось подключиться (${duration}ms)\n${error.name}: ${error.message}`, 'error');
-                
-                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-                    addResult('⚠️ ВОЗМОЖНА CORS ОШИБКА: Браузер блокирует запрос из-за политики CORS', 'warning');
-                    addResult('💡 РЕШЕНИЕ: Проверьте настройки CORS на сервере. Сервер должен разрешать запросы с вашего домена.', 'info');
+                if (error.name === 'TypeError' && error.message.includes('Unexpected token')) {
+                    addResult(`❌ СЕРВЕР ВОЗВРАЩАЕТ HTML: Получен HTML вместо JSON (${duration}ms)\nОшибка: ${error.message.split('\n')[0]}`, 'error');
+                    addResult(`💡 РЕШЕНИЕ: Проверьте что:\n1. Backend URL правильный\n2. Сервер запущен и работает\n3. Нет редиректов на HTML страницы`, 'info');
+                } else if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    addResult(`❌ CORS ОШИБКА: Не удалось подключиться (${duration}ms)\nБраузер блокирует запрос из-за политики CORS`, 'error');
+                    addResult(`💡 РЕШЕНИЕ: Проверьте настройки CORS на сервере\nСервер должен разрешать запросы с: ${window.location.origin}`, 'info');
+                } else {
+                    addResult(`❌ ОШИБКА: ${error.name}: ${error.message} (${duration}ms)`, 'error');
                 }
             }
         }
@@ -451,34 +493,42 @@
         async function testEndpoint(endpoint, method = 'GET') {
             const url = BACKEND_URL + endpoint;
             const startTime = Date.now();
-            const button = event.target;
-            const resetButton = showLoading(button);
+            const button = event?.target;
+            const resetButton = button ? showLoading(button, 'Тест...') : () => {};
             
-            addResult(`🔍 Тестирование: ${method} ${url}`, 'info');
+            addResult(`Тестирование: ${method} ${url}`, 'info');
             
             try {
                 const response = await fetch(url, {
                     method: method,
                     mode: 'cors',
                     headers: {
+                        'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     }
                 });
                 
                 const duration = Date.now() - startTime;
+                const contentType = response.headers.get('content-type');
                 
                 if (response.ok) {
-                    const data = await response.json();
-                    addResult(`✅ УСПЕХ: ${endpoint} (${duration}ms)\nСтатус: ${data.status || 'OK'}\nCORS: ✅ Работает\nОтвет: ${JSON.stringify(data).substring(0, 200)}...`, 'success');
+                    if (contentType && contentType.includes('application/json')) {
+                        const data = await response.json();
+                        addResult(`✅ УСПЕХ: ${endpoint} (${duration}ms)\nСтатус: ${data.status || 'OK'}\nОтвет: ${JSON.stringify(data).substring(0, 150)}...`, 'success');
+                    } else {
+                        const text = await response.text();
+                        addResult(`⚠️ ПРЕДУПРЕЖДЕНИЕ: ${endpoint} возвращает HTML (${duration}ms)\nПервые 200 символов: ${text.substring(0, 200)}...`, 'warning');
+                    }
                 } else {
                     addResult(`❌ ОШИБКА: ${endpoint} - HTTP ${response.status}: ${response.statusText}`, 'error');
                 }
             } catch (error) {
                 const duration = Date.now() - startTime;
-                addResult(`❌ ОШИБКА: ${endpoint} (${duration}ms)\n${error.name}: ${error.message}`, 'error');
                 
-                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-                    addResult('⚠️ ВОЗМОЖНА CORS ОШИБКА: Проверьте настройки CORS на сервере', 'warning');
+                if (error.name === 'TypeError' && error.message.includes('Unexpected token')) {
+                    addResult(`❌ СЕРВЕР ВОЗВРАЩАЕТ HTML: ${endpoint} (${duration}ms)\nОшибка парсинга JSON: ${error.message.split('\n')[0]}`, 'error');
+                } else {
+                    addResult(`❌ ОШИБКА: ${endpoint} (${duration}ms)\n${error.name}: ${error.message}`, 'error');
                 }
             } finally {
                 resetButton();
@@ -489,9 +539,9 @@
             const url = BACKEND_URL + '/api/send-photo';
             const startTime = Date.now();
             const button = event.target;
-            const resetButton = showLoading(button);
+            const resetButton = showLoading(button, 'Отправка...');
             
-            addResult(`🔍 Тестирование: POST ${url}`, 'info');
+            addResult(`Тестирование: POST ${url}`, 'info');
             
             // Создаем тестовые base64 данные (маленькое красное изображение 1x1 пиксель)
             const testImageData = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=';
@@ -501,6 +551,7 @@
                     method: 'POST',
                     mode: 'cors',
                     headers: {
+                        'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -511,20 +562,20 @@
                 });
 
                 const duration = Date.now() - startTime;
-                const result = await response.json();
                 
-                if (response.ok && result.success) {
-                    addResult(`✅ УСПЕХ: Фото отправлено (${duration}ms)\nMessage ID: ${result.message_id}\nCORS: ✅ Работает`, 'success');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        addResult(`✅ УСПЕХ: Фото отправлено (${duration}ms)\nMessage ID: ${result.message_id}`, 'success');
+                    } else {
+                        addResult(`❌ ОШИБКА: Не удалось отправить фото (${duration}ms)\nОшибка: ${result.error || 'Unknown error'}`, 'error');
+                    }
                 } else {
-                    addResult(`❌ ОШИБКА: Не удалось отправить фото (${duration}ms)\nОшибка: ${result.error || 'Unknown error'}\nДетали: ${JSON.stringify(result)}`, 'error');
+                    addResult(`❌ ОШИБКА: HTTP ${response.status}: ${response.statusText}`, 'error');
                 }
             } catch (error) {
                 const duration = Date.now() - startTime;
                 addResult(`❌ ОШИБКА: ${url} (${duration}ms)\n${error.name}: ${error.message}`, 'error');
-                
-                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-                    addResult('⚠️ ВОЗМОЖНА CORS ОШИБКА: Проверьте настройки CORS на сервере', 'warning');
-                }
             } finally {
                 resetButton();
             }
@@ -534,9 +585,9 @@
             const url = BACKEND_URL + '/api/test-base64';
             const startTime = Date.now();
             const button = event.target;
-            const resetButton = showLoading(button);
+            const resetButton = showLoading(button, 'Проверка...');
             
-            addResult(`🔍 Тестирование: POST ${url}`, 'info');
+            addResult(`Тестирование: POST ${url}`, 'info');
             
             const testImageData = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=';
             
@@ -545,6 +596,7 @@
                     method: 'POST',
                     mode: 'cors',
                     headers: {
+                        'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -553,84 +605,16 @@
                 });
 
                 const duration = Date.now() - startTime;
-                const result = await response.json();
                 
                 if (response.ok) {
-                    addResult(`✅ УСПЕХ: Base64 проверен (${duration}ms)\nValid: ${result.valid}\nOriginal: ${result.originalLength} chars\nCleaned: ${result.cleanedLength} chars`, 'success');
+                    const result = await response.json();
+                    addResult(`✅ УСПЕХ: Base64 проверен (${duration}ms)\nValid: ${result.valid}\nOriginal: ${result.originalLength} chars`, 'success');
                 } else {
                     addResult(`❌ ОШИБКА: Base64 проверка не удалась (${duration}ms)`, 'error');
                 }
             } catch (error) {
                 const duration = Date.now() - startTime;
                 addResult(`❌ ОШИБКА: ${url} (${duration}ms)\n${error.message}`, 'error');
-            } finally {
-                resetButton();
-            }
-        }
-        
-        async function testCorsPreflight() {
-            const url = BACKEND_URL + '/api/send-photo';
-            const startTime = Date.now();
-            const button = event.target;
-            const resetButton = showLoading(button);
-            
-            addResult(`🔍 Тестирование CORS Preflight: OPTIONS ${url}`, 'info');
-            
-            try {
-                const response = await fetch(url, {
-                    method: 'OPTIONS',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Request-Method': 'POST',
-                        'Access-Control-Request-Headers': 'Content-Type'
-                    }
-                });
-                
-                const duration = Date.now() - startTime;
-                
-                if (response.ok) {
-                    const corsHeaders = {
-                        'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
-                        'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
-                        'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers')
-                    };
-                    
-                    addResult(`✅ УСПЕХ: CORS Preflight (${duration}ms)\nHeaders: ${JSON.stringify(corsHeaders)}`, 'success');
-                } else {
-                    addResult(`❌ ОШИБКА: CORS Preflight failed - HTTP ${response.status}`, 'error');
-                }
-            } catch (error) {
-                const duration = Date.now() - startTime;
-                addResult(`❌ ОШИБКА: CORS Preflight (${duration}ms)\n${error.message}`, 'error');
-            } finally {
-                resetButton();
-            }
-        }
-
-        async function testWithoutCors() {
-            const url = BACKEND_URL + '/';
-            const startTime = Date.now();
-            const button = event.target;
-            const resetButton = showLoading(button);
-            
-            addResult(`🔍 Тестирование без CORS: GET ${url}`, 'info');
-            
-            try {
-                // Пытаемся сделать запрос без CORS (будет заблокирован браузером)
-                const response = await fetch(url, {
-                    method: 'GET',
-                    mode: 'no-cors'
-                });
-                
-                const duration = Date.now() - startTime;
-                
-                // В режиме no-cors response всегда будет opaque, мы не можем прочитать ответ
-                addResult(`⚠️ Запрос в режиме no-cors завершен (${duration}ms)\nСтатус: Response будет opaque\nЭто нормально - браузер блокирует чтение ответа без CORS`, 'warning');
-                
-            } catch (error) {
-                const duration = Date.now() - startTime;
-                addResult(`❌ ОШИБКА: Запрос без CORS (${duration}ms)\n${error.message}`, 'error');
             } finally {
                 resetButton();
             }
@@ -653,92 +637,83 @@
             
             for (const endpoint of endpoints) {
                 await testEndpoint(endpoint.path, endpoint.method);
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Задержка между запросами
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
             
             // Тестируем POST endpoints
             await testPhotoEndpoint();
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 500));
             await testBase64Endpoint();
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await testCorsPreflight();
             
             addResult(`📊 ТЕСТИРОВАНИЕ ЗАВЕРШЕНО: Успешно ${testResults.success} из ${testResults.completed}`, 
                      testResults.error === 0 ? 'success' : 'warning');
         }
         
         function exportResults() {
-            const results = document.getElementById('results').innerText;
-            const blob = new Blob([results], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `cors-test-results-${new Date().toISOString().split('T')[0]}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            addResult('💾 Результаты экспортированы в файл', 'info');
+            try {
+                const results = document.getElementById('results').innerText;
+                const blob = new Blob([results], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cors-test-${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                addResult('💾 Логи экспортированы в файл', 'success');
+            } catch (error) {
+                addResult(`❌ Ошибка экспорта: ${error.message}`, 'error');
+            }
         }
         
-        function showTechnicalInfo() {
-            const techInfo = `
-Техническая информация:
-
-User Agent: ${navigator.userAgent}
-Платформа: ${navigator.platform}
-Язык: ${navigator.language}
-Cookies: ${navigator.cookieEnabled ? 'Включены' : 'Выключены'}
-Online: ${navigator.onLine ? 'Да' : 'Нет'}
-Java: ${navigator.javaEnabled ? 'Включена' : 'Выключена'}
-Screen: ${screen.width}x${screen.height}
-Color Depth: ${screen.colorDepth} bit
-Pixel Ratio: ${window.devicePixelRatio}
-Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}
-Local Time: ${new Date().toString()}
-            `.trim();
-            
-            addResult(`🔧 ТЕХНИЧЕСКАЯ ИНФОРМАЦИЯ:\n${techInfo}`, 'info');
-        }
-
-        function showDebugInfo() {
+        function toggleDebug() {
             const debugSection = document.getElementById('debugSection');
-            const debugInfo = document.getElementById('debugInfo');
+            const isVisible = debugSection.style.display !== 'none';
             
-            debugSection.style.display = 'block';
+            if (!isVisible) {
+                showDebugInfo();
+                debugSection.style.display = 'block';
+            } else {
+                debugSection.style.display = 'none';
+            }
+        }
+        
+        function showDebugInfo() {
+            const debugInfo = document.getElementById('debugInfo');
             
             const info = `
 📍 Текущий URL: ${window.location.href}
 🔗 Backend URL: ${BACKEND_URL}
 🌐 Протокол: ${window.location.protocol}
 📡 Хост: ${window.location.host}
-🚀 Путь: ${window.location.pathname}
 
 🔍 Настройки CORS:
-- Режим: ${window.location.protocol === 'https:' ? 'HTTPS (рекомендуется)' : 'HTTP (может быть проблем с камерой)'}
-- Домен: ${window.location.origin}
-- Бэкенд: ${BACKEND_URL}
+- Frontend: ${window.location.origin}
+- Backend: ${BACKEND_URL}
+- Режим: ${window.location.protocol === 'https:' ? 'HTTPS' : 'HTTP'}
 
-💡 Рекомендации:
-1. Убедитесь, что бэкенд запущен и доступен
-2. Проверьте настройки CORS на сервере
-3. Для камеры требуется HTTPS
-4. User ID должен быть: 1189539923
+📊 Информация о браузере:
+- User Agent: ${navigator.userAgent}
+- Платформа: ${navigator.platform}
+- Online: ${navigator.onLine ? 'Да' : 'Нет'}
+- Cookies: ${navigator.cookieEnabled ? 'Включены' : 'Выключены'}
 
-🛠 Если есть CORS ошибки:
+💡 Проблема: Сервер возвращает HTML вместо JSON
+🔧 Возможные решения:
+1. Проверьте что backend URL правильный
+2. Убедитесь что сервер запущен
+3. Проверьте нет ли редиректа на HTML страницу
+4. Убедитесь что endpoint существует
+
+🚨 Если CORS ошибка:
 - Проверьте Railway переменные окружения
-- Убедитесь, что CORS настроен на разрешение вашего домена
-- Проверьте логи сервера в Railway
+- Убедитесь что CORS настроен на разрешение вашего домена
             `.trim();
             
-            debugInfo.innerHTML = `<pre class="result info">${info}</pre>`;
-            
-            addResult('🐛 Debug информация показана', 'info');
+            debugInfo.innerHTML = `<pre style="margin: 0; font-size: 0.8rem; line-height: 1.3;">${info}</pre>`;
         }
-        
-        // Автоматически обновляем время
-        setInterval(updateCurrentTime, 1000);
     </script>
 </body>
 </html>
