@@ -3,321 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ЛР №3 — Отношение теплоёмкостей (тест)</title>
+    <title>ЛР №3 — Отношение теплоёмкостей</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
         body {
             margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            color: #333;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         .container {
-            max-width: 900px;
+            max-width: 100%;
             margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1, h2, h3 {
-            color: #2c3e50;
+            background: white;
+            min-height: 100vh;
+            padding: 15px;
+            border-radius: 0;
         }
         h1 {
             text-align: center;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
+            color: #2c3e50;
+            margin: 10px 0 20px 0;
+            font-size: 1.4em;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .tab-buttons {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+        .tab-button {
+            flex: 1;
+            padding: 12px 5px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            color: #667eea;
         }
         .section {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
         }
         .section-title {
-            background-color: #3498db;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 10px;
-            margin: -15px -15px 15px -15px;
-            border-radius: 5px 5px 0 0;
+            padding: 12px 15px;
+            font-weight: 600;
+            font-size: 1.1em;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
+        tr {
+            border-bottom: 1px solid #f0f0f0;
         }
-        th {
-            background-color: #f2f2f2;
+        tr:last-child {
+            border-bottom: none;
+        }
+        td {
+            padding: 12px 8px;
+            vertical-align: top;
+        }
+        td:first-child {
+            font-weight: 500;
+            color: #2c3e50;
+            width: 60%;
+            font-size: 0.95em;
         }
         select {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9em;
+            transition: border-color 0.3s ease;
+        }
+        select:focus {
+            border-color: #667eea;
+            outline: none;
         }
         .btn {
-            background-color: #3498db;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1em;
+            width: 100%;
+            margin: 8px 0;
             cursor: pointer;
-            font-size: 16px;
-            margin: 5px;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        .btn:hover { background-color: #2980b9; }
-        .btn-reset { background-color: #e74c3c; }
-        .btn-reset:hover { background-color: #c0392b; }
-        .btn-telegram { background-color: #0088cc; }
-        .btn-telegram:hover { background-color: #0077b3; }
-        .btn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         }
-        .btn:disabled:hover {
-            background-color: #cccccc;
+        .btn-reset {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
         }
-        .result { padding: 10px; background-color: #f9f9f9; border-radius: 4px; margin-top: 10px; }
-        .score { font-weight: bold; font-size: 18px; }
-        .navigation { display: flex; justify-content: space-between; margin-top: 20px; }
-        .tab { display: none; }
-        .tab.active { display: block; }
-        .tab-buttons {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
+        .btn-telegram {
+            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
         }
-        .tab-button {
-            padding: 10px 20px;
-            background-color: #f1f1f1;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px 5px 0 0;
-            margin-right: 5px;
-        }
-        .tab-button.active {
-            background-color: #3498db;
-            color: white;
-        }
-        .hint {
-            display: none;
-            margin-top: 5px;
-            padding: 8px;
-            background-color: #e8f4fc;
-            border-left: 3px solid #3498db;
-            font-size: 0.9em;
-        }
-        .hint.show { display: block; }
-        .hint-btn {
-            background: none;
-            border: none;
-            color: #3498db;
-            cursor: pointer;
-            font-weight: bold;
-            margin-left: 5px;
-        }
-        .hint-btn.hidden {
-            display: none;
-        }
-        .mode-toggle {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #fafafa;
-            border-radius: 5px;
-        }
-        code {
-            background: #f1f3f5;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-family: monospace;
-        }
-        
-        /* Новые стили для улучшений */
         .progress-container {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
             margin: 15px 0;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
         .progress-bar {
-            height: 10px;
-            background-color: #e9ecef;
-            border-radius: 5px;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
             overflow: hidden;
-            margin: 5px 0;
+            margin: 10px 0;
         }
         .progress-fill {
             height: 100%;
-            background-color: #3498db;
-            transition: width 0.3s ease;
-        }
-        .progress-text {
-            text-align: center;
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-        .timer {
-            padding: 8px 12px;
-            background-color: #e8f4fc;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
             border-radius: 4px;
-            display: inline-block;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        .question-nav {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
         }
         .question-number {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            line-height: 30px;
-            text-align: center;
-            background-color: #f1f1f1;
-            border-radius: 50%;
-            margin-right: 5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 2px;
+            font-size: 0.9em;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
         .question-number.active {
-            background-color: #3498db;
+            background: #667eea;
             color: white;
+            transform: scale(1.1);
         }
         .question-number.answered {
-            background-color: #2ecc71;
+            background: #2ecc71;
             color: white;
         }
-        
-        /* Стили для настроек Telegram */
-        .telegram-settings {
+        .hint-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hint {
+            background: #e8f4fc;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 5px;
+            font-size: 0.9em;
+            border-left: 4px solid #3498db;
+            display: none;
+        }
+        .hint.show {
+            display: block;
+        }
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
             margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .score-display {
+            font-size: 2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+        }
+        .telegram-settings {
+            background: #f8f9fa;
             padding: 15px;
-            background-color: #f0f8ff;
-            border-radius: 5px;
-            border-left: 4px solid #0088cc;
+            border-radius: 12px;
+            margin: 15px 0;
         }
-        .telegram-settings h4 {
-            margin-top: 0;
-            color: #0088cc;
-        }
-        .telegram-settings input {
+        input {
             width: 100%;
-            padding: 8px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 1em;
         }
-        
-        /* Адаптивность для мобильных */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            table {
-                font-size: 0.9em;
-            }
-            th, td {
-                padding: 6px 4px;
-            }
-            .btn {
-                display: block;
-                width: 100%;
-                margin: 5px 0;
-            }
-            .navigation {
-                flex-direction: column;
-            }
-            .tab-buttons {
-                flex-wrap: wrap;
-            }
-            .tab-button {
-                flex: 1;
-                min-width: 120px;
-                margin-bottom: 5px;
-            }
+        .mode-toggle {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
-        
-        /* Стили для статуса отправки */
         .status-message {
             padding: 10px;
             margin: 10px 0;
-            border-radius: 4px;
+            border-radius: 8px;
             text-align: center;
+            font-weight: 500;
         }
         .status-success {
-            background-color: #d4edda;
+            background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
         .status-error {
-            background-color: #f8d7da;
+            background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+        .timer {
+            padding: 8px 12px;
+            background: #e8f4fc;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>ЛР №3<br>Определение отношения теплоёмкостей (тест)</h1>
+        <h1>ЛР №3<br>Отношение теплоёмкостей</h1>
         
         <div class="tab-buttons">
-            <button class="tab-button active" onclick="openTab('test')">Тестирование</button>
+            <button class="tab-button active" onclick="openTab('test')">Тест</button>
             <button class="tab-button" onclick="openTab('results')">Результаты</button>
             <button class="tab-button" onclick="openTab('settings')">Настройки</button>
         </div>
 
-        <!-- Тестирование -->
         <div id="test" class="tab active">
             <div class="mode-toggle">
-                <label>
-                    <input type="checkbox" id="modeToggle" onchange="toggleMode()">
-                    <strong>Режим обучения</strong> (подсказки доступны, оценка не начисляется)
+                <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="modeToggle" onchange="toggleMode()" style="width: 20px; height: 20px;">
+                    <strong>Режим обучения</strong>
                 </label>
             </div>
 
-            <!-- Прогресс-бар -->
             <div class="progress-container">
-                <div class="timer" id="timer">Время: 0:00</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div class="timer" id="timer">⏱ 0:00</div>
+                    <div id="studentNameDisplay" style="font-weight: 600; color: #667eea;">—</div>
+                </div>
                 <div class="progress-bar">
                     <div class="progress-fill" id="progress" style="width: 0%"></div>
                 </div>
-                <div class="progress-text" id="progress-text">Отвечено на 0 из 12 вопросов</div>
-            </div>
-
-            <!-- Навигация по вопросам -->
-            <div class="question-nav">
-                <div id="question-numbers">
-                    <!-- JavaScript заполнит это -->
+                <div class="progress-text" id="progress-text">0/12 вопросов</div>
+                
+                <div id="question-numbers" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-top: 10px;">
+                    <!-- Навигация по вопросам -->
                 </div>
             </div>
 
             <div class="section">
-                <h3 class="section-title">Вопросы</h3>
+                <div class="section-title">Вопросы теста</div>
                 <table>
                     <tr>
                         <td>1. Что такое теплоёмкость?</td>
                         <td>
                             <select id="q1">
                                 <option value="">Выберите ответ</option>
-                                <option value="heat_capacity">Теплота, необходимая для нагрева тела на 1 К</option>
-                                <option value="wrong1">Способность тела сохранять температуру</option>
-                                <option value="wrong2">Температуропроводность вещества</option>
+                                <option value="heat_capacity">Теплота для нагрева тела на 1 К</option>
+                                <option value="wrong1">Способность сохранять температуру</option>
+                                <option value="wrong2">Температуропроводность</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h1')">?</button>
-                            <div id="h1" class="hint">C* = δQ/dT (теплота для нагрева на 1 К)</div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h1')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h1" class="hint">C* = δQ/dT (теплота для нагрева на 1 К)</div></td></tr>
+                    
                     <tr>
                         <td>2. Что такое удельная теплоёмкость?</td>
                         <td>
@@ -328,10 +321,10 @@
                                 <option value="wrong2">Теплоёмкость при постоянном давлении</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h2')">?</button>
-                            <div id="h2" class="hint">c = C*/m (теплоёмкость единицы массы)</div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h2')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h2" class="hint">c = C*/m (теплоёмкость единицы массы)</div></td></tr>
+                    
                     <tr>
                         <td>3. Что такое молярная теплоёмкость?</td>
                         <td>
@@ -342,10 +335,10 @@
                                 <option value="wrong2">Теплоёмкость при постоянном объёме</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h3')">?</button>
-                            <div id="h3" class="hint">C = C*/ν (теплоёмкость одного моля)</div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h3')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h3" class="hint">C = C*/ν (теплоёмкость одного моля)</div></td></tr>
+                    
                     <tr>
                         <td>4. Какой процесс называется адиабатическим?</td>
                         <td>
@@ -356,10 +349,10 @@
                                 <option value="wrong2">Процесс при постоянном давлении</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h4')">?</button>
-                            <div id="h4" class="hint">Адиабатический процесс: δQ = 0 (нет теплообмена)</div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h4')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h4" class="hint">Адиабатический процесс: δQ = 0 (нет теплообмена)</div></td></tr>
+                    
                     <tr>
                         <td>5. Уравнение адиабатического процесса (Пуассона):</td>
                         <td>
@@ -370,10 +363,10 @@
                                 <option value="wrong2">P/T = const</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h5')">?</button>
-                            <div id="h5" class="hint">Уравнение Пуассона: PV<sup>γ</sup> = const, γ = C<sub>p</sub>/C<sub>v</sub></div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h5')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h5" class="hint">Уравнение Пуассона: PV<sup>γ</sup> = const, γ = C<sub>p</sub>/C<sub>v</sub></div></td></tr>
+                    
                     <tr>
                         <td>6. Как связаны молярные теплоёмкости C<sub>p</sub> и C<sub>v</sub>?</td>
                         <td>
@@ -384,10 +377,10 @@
                                 <option value="wrong2">C<sub>p</sub> = C<sub>v</sub> - R</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h6')">?</button>
-                            <div id="h6" class="hint">Соотношение Майера: C<sub>p</sub> = C<sub>v</sub> + R</div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h6')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h6" class="hint">Соотношение Майера: C<sub>p</sub> = C<sub>v</sub> + R</div></td></tr>
+                    
                     <tr>
                         <td>7. Чему равен показатель адиабаты γ для идеального одноатомного газа?</td>
                         <td>
@@ -398,10 +391,10 @@
                                 <option value="wrong2">4/3 ≈ 1.33</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h7')">?</button>
-                            <div id="h7" class="hint">γ = (i+2)/i, для одноатомного i=3 → γ=5/3</div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h7')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h7" class="hint">γ = (i+2)/i, для одноатомного i=3 → γ=5/3</div></td></tr>
+                    
                     <tr>
                         <td>8. Чему равен показатель адиабаты γ для идеального двухатомного газа?</td>
                         <td>
@@ -412,10 +405,10 @@
                                 <option value="wrong2">4/3 ≈ 1.33</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h8')">?</button>
-                            <div id="h8" class="hint">γ = (i+2)/i, для двухатомного i=5 → γ=7/5</div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h8')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h8" class="hint">γ = (i+2)/i, для двухатомного i=5 → γ=7/5</div></td></tr>
+                    
                     <tr>
                         <td>9. Формула для скорости звука в газе через показатель адиабаты:</td>
                         <td>
@@ -426,10 +419,10 @@
                                 <option value="wrong2">w<sub>зв</sub> = √(γR/T)</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h9')">?</button>
-                            <div id="h9" class="hint">Скорость звука: w<sub>зв</sub> = √(γRT/M)</div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h9')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h9" class="hint">Скорость звука: w<sub>зв</sub> = √(γRT/M)</div></td></tr>
+                    
                     <tr>
                         <td>10. Первый закон термодинамики для адиабатического процесса:</td>
                         <td>
@@ -440,10 +433,10 @@
                                 <option value="wrong2">δQ = dU + δA</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h10')">?</button>
-                            <div id="h10" class="hint">Адиабата: δQ = 0 → dU = -δA</div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h10')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h10" class="hint">Адиабата: δQ = 0 → dU = -δA</div></td></tr>
+                    
                     <tr>
                         <td>11. Почему C<sub>p</sub> > C<sub>v</sub>?</td>
                         <td>
@@ -454,10 +447,10 @@
                                 <option value="wrong2">Из-за разной молярной массы</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h11')">?</button>
-                            <div id="h11" class="hint">При P=const часть теплоты идёт на работу расширения</div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h11')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h11" class="hint">При P=const часть теплоты идёт на работу расширения</div></td></tr>
+                    
                     <tr>
                         <td>12. Какое значение γ ожидается для воздуха в данной работе?</td>
                         <td>
@@ -468,156 +461,136 @@
                                 <option value="wrong2">~1.33 (многоатомный газ)</option>
                             </select>
                         </td>
-                        <td><button class="hint-btn" onclick="toggleHint('h12')">?</button>
-                            <div id="h12" class="hint">Воздух: в основном N₂ и O₂ (двухатомные) → γ≈1.4</div>
-                        </td>
+                        <td><button class="hint-btn" onclick="toggleHint('h12')">?</button></td>
                     </tr>
+                    <tr><td colspan="3"><div id="h12" class="hint">Воздух: в основном N₂ и O₂ (двухатомные) → γ≈1.4</div></td></tr>
                 </table>
             </div>
 
             <button class="btn" onclick="saveAnswers()">Сохранить ответы</button>
-            <button class="btn" onclick="openTab('results')">К результатам →</button>
+            <button class="btn" onclick="openTab('results')">Посмотреть результаты</button>
         </div>
 
-        <!-- Результаты -->
         <div id="results" class="tab">
-            <div class="section">
-                <h3 class="section-title">Результаты</h3>
-
-                <div style="margin-bottom:15px; padding:10px; background-color:#eaf2f8; border-radius:4px;">
-                    <strong>Ученик:</strong> <span id="studentNameDisplay">—</span>
+            <div class="result-card">
+                <h3>Ваши результаты</h3>
+                <div class="score-display" id="totalScore">0</div>
+                <div style="font-size: 1.2em; color: #2c3e50;" id="grade">Неудовлетворительно</div>
+                <div style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <strong>Студент:</strong> <span id="studentNameResults">—</span>
                 </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Макс. балл</th>
-                            <th>Ваш балл</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><th>25</th><td id="totalScore">0</td></tr>
-                    </tbody>
-                </table>
-
-                <div class="result">
-                    <p><strong>Оценка:</strong> <span id="grade">Неудовлетворительно</span></p>
-                    <p class="score" id="scoreText">Ваш результат: 0 из 25 баллов</p>
-                </div>
-
-                <div id="telegramStatus"></div>
-
-                <button class="btn" onclick="calculateScore()">Пересчитать</button>
-                <button class="btn" id="submitGoogleBtn" onclick="submitToGoogleForm()">Отправить в Google Form</button>
-                <button class="btn btn-telegram" id="submitTelegramBtn" onclick="sendToTelegram()">Отправить в Telegram</button>
-                <button class="btn btn-reset" onclick="resetAll()">Сбросить всё</button>
             </div>
-            <div class="navigation">
-                <button class="btn" onclick="openTab('test')">← Назад к тесту</button>
+
+            <div id="telegramStatus"></div>
+
+            <button class="btn" onclick="calculateScore()">Пересчитать</button>
+            <button class="btn btn-telegram" id="submitTelegramBtn" onclick="sendToTelegram()">Отправить в Telegram</button>
+            <button class="btn btn-reset" onclick="resetAll()">Начать заново</button>
+            
+            <div style="margin-top: 15px;">
+                <button class="btn" onclick="openTab('test')">← Вернуться к тесту</button>
             </div>
         </div>
 
-        <!-- Настройки -->
         <div id="settings" class="tab">
             <div class="section">
-                <h3 class="section-title">Настройки Telegram</h3>
-                
+                <div class="section-title">Настройки Telegram</div>
                 <div class="telegram-settings">
-                    <label for="botToken">Токен бота:</label>
-                    <input type="text" id="botToken" placeholder="Введите токен бота">
+                    <input type="text" id="botToken" placeholder="Токен бота (получите у @BotFather)">
+                    <input type="text" id="chatId" placeholder="ID чата/группы">
                     
-                    <label for="chatId">ID чата:</label>
-                    <input type="text" id="chatId" placeholder="Введите ID чата">
-                    
-                    <button class="btn btn-telegram" onclick="saveTelegramSettings()">Сохранить настройки</button>
+                    <button class="btn" onclick="saveTelegramSettings()">Сохранить настройки</button>
                     <button class="btn" onclick="testTelegramSettings()">Проверить соединение</button>
+                    <button class="btn" onclick="getGroupChatId()">Автоопределить Chat ID</button>
+                    <button class="btn btn-telegram" onclick="generateBotInviteLink()">Скопировать ссылку для добавления бота</button>
                 </div>
             </div>
-            <div class="navigation">
+            <div style="margin-top: 15px;">
                 <button class="btn" onclick="openTab('test')">← Назад к тесту</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Приветственное окно -->
-    <div id="welcomeModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-        <div style="background:white; padding:20px; border-radius:8px; width:300px; text-align:center;">
-            <h3 style="margin-top:0; color:#2c3e50;">Добро пожаловать!</h3>
-            <p>Введите ваше имя и фамилию:</p>
-            <input type="text" id="studentNameInput" style="width:100%; padding:8px; margin:10px 0; border:1px solid #ccc; border-radius:4px;" placeholder="Напр.: Иванов Иван">
-            <div style="display:flex; justify-content:space-between; gap:10px; margin-top:15px;">
-                <button style="padding:8px 16px; border:none; border-radius:4px; background:#3498db; color:white; cursor:pointer;" onclick="saveStudentName()">OK</button>
-                <button style="padding:8px 16px; border:none; border-radius:4px; background:#e74c3c; color:white; cursor:pointer;" onclick="closeWelcomeModal()">Отмена</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Глобальные переменные
+        // Инициализация Telegram Web App
+        const tg = window.Telegram.WebApp;
         let isTrainingMode = false;
         let startTime = null;
         let timerInterval = null;
         
         // Настройки Telegram по умолчанию
-        const DEFAULT_BOT_TOKEN = "8344281396:AAGZ9-M2XRyPMHiI2akBSSIN7QAtRGDmLOY";
-        const DEFAULT_CHAT_ID = "1189539923";
-        
+        const DEFAULT_BOT_TOKEN = "";
+        const DEFAULT_CHAT_ID = "";
+
+        function initTelegramApp() {
+            tg.expand();
+            tg.enableClosingConfirmation();
+            
+            // Используем данные пользователя Telegram
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                const userName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                document.getElementById('studentNameDisplay').textContent = userName;
+                document.getElementById('studentNameResults').textContent = userName;
+                localStorage.setItem('studentName_LR3', userName);
+            }
+            
+            // Настройка основной кнопки
+            tg.MainButton.setText("Отправить результаты");
+            tg.MainButton.onClick(sendToTelegram);
+            updateMainButton();
+            
+            // Запускаем таймер
+            startTimer();
+        }
+
+        function updateMainButton() {
+            if (isTrainingMode) {
+                tg.MainButton.hide();
+                return;
+            }
+            
+            const allAnswered = checkAllAnswered();
+            if (allAnswered) {
+                tg.MainButton.show();
+            } else {
+                tg.MainButton.hide();
+            }
+        }
+
+        function checkAllAnswered() {
+            for (let i = 1; i <= 12; i++) {
+                if (!document.getElementById('q'+i).value) return false;
+            }
+            return true;
+        }
+
         function openTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
             [...document.querySelectorAll('.tab-button')].find(b => b.getAttribute('onclick')?.includes(tabName))?.classList.add('active');
             
-            if (tabName === 'results' && !isTrainingMode) {
+            if (tabName === 'results') {
                 calculateScore();
             }
-            
-            // Обновляем состояние кнопок отправки
-            updateSubmitButtons();
+            updateMainButton();
         }
 
         function toggleMode() {
             isTrainingMode = document.getElementById('modeToggle').checked;
             localStorage.setItem('mode_LR3', isTrainingMode);
-            updateProgress();
-            
-            // Обновляем видимость подсказок
+            updateMainButton();
             updateHintsVisibility();
-            
-            // Обновляем состояние кнопок отправки
-            updateSubmitButtons();
         }
         
         function updateHintsVisibility() {
             const hintButtons = document.querySelectorAll('.hint-btn');
-            const hints = document.querySelectorAll('.hint');
-            
             if (isTrainingMode) {
-                // В режиме обучения показываем кнопки подсказок
-                hintButtons.forEach(btn => btn.classList.remove('hidden'));
+                hintButtons.forEach(btn => btn.style.display = 'flex');
             } else {
-                // В режиме тестирования скрываем кнопки подсказок и закрываем все подсказки
-                hintButtons.forEach(btn => btn.classList.add('hidden'));
-                hints.forEach(hint => hint.classList.remove('show'));
-            }
-        }
-        
-        function updateSubmitButtons() {
-            const submitGoogleBtn = document.getElementById('submitGoogleBtn');
-            const submitTelegramBtn = document.getElementById('submitTelegramBtn');
-            
-            if (isTrainingMode) {
-                // В режиме обучения отключаем кнопки отправки
-                submitGoogleBtn.disabled = true;
-                submitTelegramBtn.disabled = true;
-                submitGoogleBtn.title = "Отправка недоступна в режиме обучения";
-                submitTelegramBtn.title = "Отправка недоступна в режиме обучения";
-            } else {
-                // В режиме тестирования включаем кнопки отправки
-                submitGoogleBtn.disabled = false;
-                submitTelegramBtn.disabled = false;
-                submitGoogleBtn.title = "";
-                submitTelegramBtn.title = "";
+                hintButtons.forEach(btn => btn.style.display = 'none');
+                document.querySelectorAll('.hint').forEach(hint => hint.classList.remove('show'));
             }
         }
         
@@ -627,46 +600,20 @@
             }
         }
 
-        function saveStudentName() {
-            const name = document.getElementById('studentNameInput').value.trim();
-            if (!name) { alert('Введите имя и фамилию.'); return; }
-            localStorage.setItem('studentName_LR3', name);
-            document.getElementById('welcomeModal').style.display = 'none';
-            document.getElementById('studentNameDisplay').textContent = name;
-            
-            // Запускаем таймер при первом вводе имени
-            if (!startTime) {
-                startTimer();
-            }
-        }
-        
-        function closeWelcomeModal() {
-            const saved = localStorage.getItem('studentName_LR3');
-            if (!saved) { 
-                alert('Пожалуйста, введите ваше имя для продолжения.'); 
-                return; 
-            }
-            document.getElementById('welcomeModal').style.display = 'none';
-            document.getElementById('studentNameDisplay').textContent = saved;
-        }
-
-        // Функция для запуска таймера
         function startTimer() {
             startTime = Date.now();
             timerInterval = setInterval(updateTimer, 1000);
         }
         
-        // Функция для обновления таймера
         function updateTimer() {
             if (!startTime) return;
             
             const elapsed = Math.floor((Date.now() - startTime) / 1000);
             const minutes = Math.floor(elapsed / 60);
             const seconds = elapsed % 60;
-            document.getElementById('timer').textContent = `Время: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timer').textContent = `⏱ ${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
-        
-        // Функция для обновления прогресса
+
         function updateProgress() {
             let answered = 0;
             for (let i = 1; i <= 12; i++) {
@@ -674,23 +621,12 @@
             }
             const progress = (answered / 12) * 100;
             document.getElementById('progress').style.width = progress + '%';
-            document.getElementById('progress-text').textContent = `Отвечено на ${answered} из 12 вопросов`;
+            document.getElementById('progress-text').textContent = `${answered}/12 вопросов`;
             
-            // Обновляем навигацию по вопросам
             updateQuestionNavigation();
-            
-            // Меняем цвет прогресс-бара в зависимости от заполнения
-            const progressFill = document.getElementById('progress');
-            if (progress < 50) {
-                progressFill.style.backgroundColor = '#e74c3c';
-            } else if (progress < 100) {
-                progressFill.style.backgroundColor = '#f39c12';
-            } else {
-                progressFill.style.backgroundColor = '#2ecc71';
-            }
+            updateMainButton();
         }
         
-        // Функция для обновления навигации по вопросам
         function updateQuestionNavigation() {
             const container = document.getElementById('question-numbers');
             container.innerHTML = '';
@@ -701,73 +637,31 @@
                 questionNumber.textContent = i;
                 questionNumber.id = 'q-nav-' + i;
                 
-                // Добавляем классы в зависимости от состояния
                 if (document.getElementById('q'+i).value) {
                     questionNumber.classList.add('answered');
                 }
                 
-                // Добавляем обработчик клика для навигации
                 questionNumber.addEventListener('click', function() {
-                    scrollToQuestion(i);
+                    document.getElementById('q'+i).scrollIntoView({behavior: 'smooth', block: 'center'});
+                    document.querySelectorAll('.question-number').forEach(q => q.classList.remove('active'));
+                    questionNumber.classList.add('active');
                 });
                 
                 container.appendChild(questionNumber);
             }
         }
-        
-        // Функция для прокрутки к вопросу
-        function scrollToQuestion(qNum) {
-            const questionRow = document.getElementById('q'+qNum).closest('tr');
-            if (questionRow) {
-                questionRow.scrollIntoView({behavior: 'smooth', block: 'center'});
-                
-                // Подсвечиваем текущий вопрос
-                document.querySelectorAll('.question-number').forEach(q => q.classList.remove('active'));
-                document.getElementById('q-nav-' + qNum).classList.add('active');
-            }
-        }
-        
-        // Функция для валидации формы
-        function validateForm() {
-            if (isTrainingMode) return true; // В режиме обучения валидация не требуется
-            
-            let allAnswered = true;
-            let firstEmpty = null;
-            
-            for (let i = 1; i <= 12; i++) {
-                if (!document.getElementById('q'+i).value) {
-                    allAnswered = false;
-                    if (!firstEmpty) firstEmpty = i;
-                }
-            }
-            
-            if (!allAnswered) {
-                if (confirm('Вы ответили не на все вопросы. Хотите перейти к первому неотвеченному вопросу?')) {
-                    scrollToQuestion(firstEmpty);
-                }
-                return false;
-            }
-            
-            return true;
-        }
 
         function saveAnswers() {
-            if (!validateForm()) {
-                return;
-            }
-            
             for (let i = 1; i <= 12; i++) {
                 localStorage.setItem('q'+i+'_LR3', document.getElementById('q'+i).value);
             }
-            localStorage.setItem('mode_LR3', isTrainingMode);
-            
-            updateProgress(); // Обновляем прогресс
+            updateProgress();
             
             if (!isTrainingMode) {
                 calculateScore();
-                alert('Ответы сохранены и оценены!');
+                tg.showPopup({title: 'Успех', message: 'Ответы сохранены и оценены!'});
             } else {
-                alert('Режим обучения: ответы сохранены.');
+                tg.showPopup({title: 'Режим обучения', message: 'Ответы сохранены. Оценка не начисляется.'});
             }
         }
 
@@ -778,34 +672,20 @@
                 q5: 'poisson', q6: 'mayer', q7: 'monoatomic', q8: 'diatomic',
                 q9: 'sound_speed', q10: 'first_law', q11: 'work', q12: 'air'
             };
-            // Первые 8 — по 2 балла, последние 4 — по 3 балла
+            
             for (let i = 1; i <= 8; i++) {
                 if (localStorage.getItem('q'+i+'_LR3') === correct['q'+i]) score += 2;
             }
             for (let i = 9; i <= 12; i++) {
                 if (localStorage.getItem('q'+i+'_LR3') === correct['q'+i]) score += 3;
             }
+            
             document.getElementById('totalScore').textContent = score;
             let grade = 'Неудовлетворительно';
             if (score >= 22) grade = 'Отлично';
             else if (score >= 17) grade = 'Хорошо';
             else if (score >= 12) grade = 'Удовлетворительно';
             document.getElementById('grade').textContent = grade;
-            document.getElementById('scoreText').textContent = `Ваш результат: ${score} из 25 баллов`;
-        }
-
-        function submitToGoogleForm() {
-            if (isTrainingMode) {
-                alert('Отправка результатов недоступна в режиме обучения.');
-                return;
-            }
-            
-            const name = document.getElementById('studentNameDisplay').textContent;
-            const score = document.getElementById('totalScore').textContent;
-            const grade = document.getElementById('grade').textContent;
-            const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScJIoC2AV7Hrb0BHfmXp4Ixbkm303I-pUvcfnY959YJSuiaOQ/viewform';
-            const url = `${formUrl}?entry.232303525=${encodeURIComponent(name)}&entry.56933389=${score}&entry.1512158149=${encodeURIComponent(grade)}`;
-            window.open(url, '_blank');
         }
 
         // Функции для работы с Telegram
@@ -814,39 +694,38 @@
             const chatId = document.getElementById('chatId').value.trim();
             
             if (!botToken || !chatId) {
-                alert('Пожалуйста, заполните все поля настроек Telegram.');
+                showTelegramStatus('Заполните все поля настроек', 'error');
                 return;
             }
             
             localStorage.setItem('telegramBotToken', botToken);
             localStorage.setItem('telegramChatId', chatId);
-            alert('Настройки Telegram сохранены!');
+            showTelegramStatus('Настройки Telegram сохранены!', 'success');
         }
         
         function loadTelegramSettings() {
             let botToken = localStorage.getItem('telegramBotToken');
             let chatId = localStorage.getItem('telegramChatId');
             
-            // Если настройки не сохранены, используем значения по умолчанию
-            if (!botToken) {
+            if (!botToken && DEFAULT_BOT_TOKEN) {
                 botToken = DEFAULT_BOT_TOKEN;
                 localStorage.setItem('telegramBotToken', botToken);
             }
-            if (!chatId) {
+            if (!chatId && DEFAULT_CHAT_ID) {
                 chatId = DEFAULT_CHAT_ID;
                 localStorage.setItem('telegramChatId', chatId);
             }
             
-            document.getElementById('botToken').value = botToken;
-            document.getElementById('chatId').value = chatId;
+            if (botToken) document.getElementById('botToken').value = botToken;
+            if (chatId) document.getElementById('chatId').value = chatId;
         }
         
         function testTelegramSettings() {
-            const botToken = document.getElementById('botToken').value.trim();
-            const chatId = document.getElementById('chatId').value.trim();
+            const botToken = document.getElementById('botToken').value.trim() || localStorage.getItem('telegramBotToken');
+            const chatId = document.getElementById('chatId').value.trim() || localStorage.getItem('telegramChatId');
             
             if (!botToken || !chatId) {
-                alert('Пожалуйста, сначала сохраните настройки Telegram.');
+                showTelegramStatus('Сначала сохраните настройки Telegram', 'error');
                 return;
             }
             
@@ -861,9 +740,69 @@
                 });
         }
         
+        function getGroupChatId() {
+            const botToken = document.getElementById('botToken').value.trim() || localStorage.getItem('telegramBotToken');
+            
+            if (!botToken) {
+                showTelegramStatus('Сначала введите токен бота', 'error');
+                return;
+            }
+            
+            showTelegramStatus('Отправьте любое сообщение в группу с ботом, затем нажмите эту кнопку снова', 'info');
+            
+            fetch(`https://api.telegram.org/bot${botToken}/getUpdates`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok && data.result.length > 0) {
+                        const groupChat = data.result.find(update => 
+                            update.message && update.message.chat && update.message.chat.id < 0
+                        );
+                        
+                        if (groupChat) {
+                            const chatId = groupChat.message.chat.id;
+                            document.getElementById('chatId').value = chatId;
+                            showTelegramStatus(`Chat ID группы найден: ${chatId}`, 'success');
+                        } else {
+                            showTelegramStatus('Групповой чат не найден. Убедитесь, что бот добавлен в группу и в группе была активность.', 'error');
+                        }
+                    } else {
+                        showTelegramStatus('Не удалось получить данные. Проверьте токен бота.', 'error');
+                    }
+                })
+                .catch(error => {
+                    showTelegramStatus('Ошибка получения Chat ID: ' + error, 'error');
+                });
+        }
+        
+        function generateBotInviteLink() {
+            const botToken = document.getElementById('botToken').value.trim() || localStorage.getItem('telegramBotToken');
+            
+            if (!botToken) {
+                showTelegramStatus('Сначала введите токен бота', 'error');
+                return;
+            }
+            
+            // Получаем username бота из токена
+            fetch(`https://api.telegram.org/bot${botToken}/getMe`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        const botUsername = data.result.username;
+                        const inviteLink = `https://t.me/${botUsername}?startgroup=true`;
+                        navigator.clipboard.writeText(inviteLink);
+                        showTelegramStatus(`Ссылка скопирована: ${inviteLink}`, 'success');
+                    } else {
+                        showTelegramStatus('Не удалось получить информацию о боте', 'error');
+                    }
+                })
+                .catch(error => {
+                    showTelegramStatus('Ошибка: ' + error, 'error');
+                });
+        }
+
         function sendToTelegram() {
             if (isTrainingMode) {
-                alert('Отправка результатов недоступна в режиме обучения.');
+                tg.showPopup({title: 'Внимание', message: 'Отправка недоступна в режиме обучения'});
                 return;
             }
             
@@ -871,39 +810,23 @@
             const chatId = localStorage.getItem('telegramChatId') || document.getElementById('chatId').value.trim();
             
             if (!botToken || !chatId) {
-                alert('Настройки Telegram не заданы. Перейдите в раздел "Настройки" для их конфигурации.');
+                showTelegramStatus('Настройки Telegram не заданы. Перейдите в раздел "Настройки".', 'error');
                 openTab('settings');
                 return;
             }
             
-            const name = document.getElementById('studentNameDisplay').textContent;
+            calculateScore();
+            const name = document.getElementById('studentNameResults').textContent;
             const score = document.getElementById('totalScore').textContent;
             const grade = document.getElementById('grade').textContent;
             
-            // Получаем детали ответов
-            let answersDetail = "Детали ответов:\n";
-            const correctAnswers = {
-                q1: 'heat_capacity', q2: 'specific', q3: 'molar', q4: 'no_heat',
-                q5: 'poisson', q6: 'mayer', q7: 'monoatomic', q8: 'diatomic',
-                q9: 'sound_speed', q10: 'first_law', q11: 'work', q12: 'air'
-            };
-            
-            let correctCount = 0;
-            for (let i = 1; i <= 12; i++) {
-                const userAnswer = localStorage.getItem('q'+i+'_LR3');
-                const isCorrect = userAnswer === correctAnswers['q'+i];
-                if (isCorrect) correctCount++;
-                answersDetail += `${i}. ${isCorrect ? '✅' : '❌'} ${isCorrect ? 'Правильно' : 'Неправильно'}\n`;
-            }
-            
             const message = `📊 Результаты теста "Отношение теплоёмкостей":
-            
+
 👤 Студент: ${name}
-🎯 Баллы: ${score}/25 (${correctCount}/12 правильных ответов)
+🎯 Баллы: ${score}/25
 📝 Оценка: ${grade}
 
-${answersDetail}
-⏱ Время выполнения: ${document.getElementById('timer').textContent}
+⏱ Время выполнения: ${document.getElementById('timer').textContent.replace('⏱ ', '')}
 📅 Дата: ${new Date().toLocaleString('ru-RU')}`;
             
             showTelegramStatus('Отправка результатов в Telegram...', 'info');
@@ -911,28 +834,11 @@ ${answersDetail}
             sendTelegramMessage(botToken, chatId, message)
                 .then(() => {
                     showTelegramStatus('Результаты успешно отправлены в Telegram!', 'success');
+                    tg.showAlert('Результаты отправлены!');
                 })
                 .catch(error => {
                     showTelegramStatus('Ошибка отправки в Telegram: ' + error, 'error');
                 });
-        }
-        
-        function showTelegramStatus(message, type) {
-            const statusElement = document.getElementById('telegramStatus');
-            statusElement.textContent = message;
-            statusElement.className = 'status-message';
-            
-            if (type === 'success') {
-                statusElement.classList.add('status-success');
-            } else if (type === 'error') {
-                statusElement.classList.add('status-error');
-            }
-            
-            // Автоматически скрыть сообщение через 5 секунд
-            setTimeout(() => {
-                statusElement.textContent = '';
-                statusElement.className = '';
-            }, 5000);
         }
         
         function sendTelegramMessage(botToken, chatId, text) {
@@ -957,21 +863,34 @@ ${answersDetail}
             })
             .then(data => {
                 if (!data.ok) {
-                    throw new Error('Telegram API: ' + data.description);
+                    throw new Error('Telegram API: ' + (data.description || 'Неизвестная ошибка'));
                 }
                 return data;
             });
         }
+        
+        function showTelegramStatus(message, type) {
+            const statusElement = document.getElementById('telegramStatus');
+            statusElement.textContent = message;
+            statusElement.className = 'status-message';
+            
+            if (type === 'success') {
+                statusElement.classList.add('status-success');
+            } else if (type === 'error') {
+                statusElement.classList.add('status-error');
+            } else {
+                statusElement.style.background = '#e8f4fc';
+                statusElement.style.color = '#2c3e50';
+            }
+        }
 
         function resetAll() {
-            if (confirm('Вы уверены, что хотите сбросить все ответы и начать заново? Это действие нельзя отменить.')) {
-                // Сохраняем настройки Telegram перед сбросом
+            if (confirm('Вы уверены, что хотите сбросить все ответы и начать заново?')) {
                 const telegramToken = localStorage.getItem('telegramBotToken');
                 const telegramChatId = localStorage.getItem('telegramChatId');
                 
                 localStorage.clear();
                 
-                // Восстанавливаем настройки Telegram
                 if (telegramToken) localStorage.setItem('telegramBotToken', telegramToken);
                 if (telegramChatId) localStorage.setItem('telegramChatId', telegramChatId);
                 
@@ -980,34 +899,30 @@ ${answersDetail}
                 }
                 document.getElementById('modeToggle').checked = false;
                 isTrainingMode = false;
-                document.getElementById('totalScore').textContent = '0';
-                document.getElementById('grade').textContent = 'Неудовлетворительно';
-                document.getElementById('scoreText').textContent = 'Ваш результат: 0 из 25 баллов';
-                document.getElementById('studentNameDisplay').textContent = '—';
                 
-                // Сброс таймера
                 if (timerInterval) {
                     clearInterval(timerInterval);
                     timerInterval = null;
                 }
                 startTime = null;
-                document.getElementById('timer').textContent = 'Время: 0:00';
+                document.getElementById('timer').textContent = '⏱ 0:00';
                 
                 updateProgress();
-                document.getElementById('welcomeModal').style.display = 'flex';
+                updateHintsVisibility();
+                tg.showPopup({title: 'Сброс', message: 'Все данные очищены'});
             }
         }
 
-        window.onload = function() {
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            initTelegramApp();
+            
             const name = localStorage.getItem('studentName_LR3');
             if (name) {
                 document.getElementById('studentNameDisplay').textContent = name;
-                // Запускаем таймер, если имя уже сохранено
-                startTimer();
-            } else {
-                document.getElementById('welcomeModal').style.display = 'flex';
+                document.getElementById('studentNameResults').textContent = name;
             }
-
+            
             isTrainingMode = localStorage.getItem('mode_LR3') === 'true';
             document.getElementById('modeToggle').checked = isTrainingMode;
 
@@ -1015,30 +930,21 @@ ${answersDetail}
                 const val = localStorage.getItem('q'+i+'_LR3');
                 if (val) document.getElementById('q'+i).value = val;
                 
-                // Добавляем обработчики изменений для автоматического сохранения
                 document.getElementById('q'+i).addEventListener('change', function() {
                     localStorage.setItem('q'+i+'_LR3', this.value);
                     updateProgress();
                 });
             }
 
-            // Загружаем настройки Telegram
             loadTelegramSettings();
-
-            // Инициализируем прогресс и навигацию
             updateProgress();
-            updateQuestionNavigation();
-            
-            // Обновляем видимость подсказок
             updateHintsVisibility();
-            
-            // Обновляем состояние кнопок отправки
-            updateSubmitButtons();
+            updateMainButton();
 
             if (!isTrainingMode) {
                 calculateScore();
             }
-        };
+        });
     </script>
 </body>
 </html>
