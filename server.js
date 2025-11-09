@@ -12,7 +12,7 @@ if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir);
 }
 
-// Функции логирования
+// Функции логирования (оставляем без изменений)
 const logger = {
     info: (message, data = {}) => {
         const logEntry = {
@@ -83,7 +83,6 @@ function appendToLogFile(logEntry) {
 app.use((req, res, next) => {
     const start = Date.now();
     
-    // Логируем входящий запрос
     logger.info('Incoming HTTP Request', {
         method: req.method,
         url: req.url,
@@ -93,7 +92,6 @@ app.use((req, res, next) => {
         contentLength: req.get('Content-Length')
     });
 
-    // Перехватываем отправку ответа для логирования
     const originalSend = res.send;
     res.send = function(data) {
         const duration = Date.now() - start;
@@ -114,8 +112,42 @@ app.use((req, res, next) => {
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '50mb' })); // Увеличиваем лимит для больших фото
 app.use(express.static('public'));
+
+// Функция для очистки base64 данных
+function cleanBase64Data(base64String) {
+    if (!base64String) return null;
+    
+    // Удаляем префикс data URL если присутствует
+    const cleaned = base64String.replace(/^data:image\/[a-z]+;base64,/, '');
+    
+    // Проверяем padding
+    const padding = cleaned.length % 4;
+    if (padding !== 0) {
+        return cleaned + '='.repeat(4 - padding);
+    }
+    
+    return cleaned;
+}
+
+// Функция для проверки валидности base64
+function isValidBase64(str) {
+    try {
+        // Пытаемся декодировать
+        const cleaned = cleanBase64Data(str);
+        if (!cleaned) return false;
+        
+        // Проверяем длину
+        if (cleaned.length % 4 !== 0) return false;
+        
+        // Пробуем декодировать
+        Buffer.from(cleaned, 'base64');
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
 
 // Health check endpoint
 app.get('/', (req, res) => {
@@ -131,7 +163,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// API endpoint for sending photos to Telegram
+// API endpoint for sending photos to Telegram - ИСПРАВЛЕННАЯ ВЕРСИЯ
 app.post('/api/send-photo', async (req, res) => {
     const requestId = Math.random().toString(36).substr(2, 9);
     const startTime = Date.now();
@@ -188,27 +220,64 @@ app.post('/api/send-photo', async (req, res) => {
             });
         }
 
-        logger.debug('Sending photo to Telegram API', {
+        // Проверяем и чистим base64 данные
+        if (!isValidBase64(photo_data)) {
+            logger.error('Invalid base64 photo data', {
+                requestId,
+                dataStart: photo_data.substring(0, 50) + '...',
+                dataLength: photo_data.length
+            });
+            
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid base64 photo data format',
+                requestId
+            });
+        }
+
+        const cleanedPhotoData = cleanBase64Data(photo_data);
+        
+        logger.debug('Cleaned photo data for sending', {
             requestId,
-            telegramApi: `https://api.telegram.org/bot***/sendPhoto`,
-            photoSize: Math.round(photo_data.length / 1024) + ' KB',
-            caption: caption || 'default'
+            originalLength: photo_data.length,
+            cleanedLength: cleanedPhotoData.length,
+            isBase64Valid: isValidBase64(photo_data)
         });
 
-        // Send photo to Telegram
+        // Создаем FormData для отправки файла
+        const FormData = require('form-data');
+        const form = new FormData();
+        
+        // Добавляем поля в форму
+        form.append('chat_id', user_id);
+        
+        // Создаем buffer из base64 и добавляем как файл
+        const imageBuffer = Buffer.from(cleanedPhotoData, 'base64');
+        form.append('photo', imageBuffer, {
+            filename: `photo-${Date.now()}.jpg`,
+            contentType: 'image/jpeg'
+        });
+        
+        if (caption) {
+            form.append('caption', caption);
+        }
+        form.append('parse_mode', 'HTML');
+
+        logger.debug('Sending photo to Telegram API using FormData', {
+            requestId,
+            imageBufferSize: imageBuffer.length + ' bytes',
+            hasCaption: !!caption
+        });
+
+        // Send photo to Telegram используя FormData
         const telegramStart = Date.now();
         const response = await axios.post(
             `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendPhoto`,
-            {
-                chat_id: user_id,
-                photo: photo_data,
-                caption: caption || '📸 Фото с веб-камеры',
-                parse_mode: 'HTML'
-            },
+            form,
             {
                 timeout: 30000,
                 headers: {
-                    'Content-Type': 'application/json'
+                    ...form.getHeaders(),
                 }
             }
         );
@@ -220,7 +289,8 @@ app.post('/api/send-photo', async (req, res) => {
             messageId: response.data.result.message_id,
             chatId: response.data.result.chat.id,
             telegramDuration: `${telegramDuration}ms`,
-            totalDuration: `${Date.now() - startTime}ms`
+            totalDuration: `${Date.now() - startTime}ms`,
+            method: 'FormData'
         });
         
         res.json({ 
@@ -238,7 +308,8 @@ app.post('/api/send-photo', async (req, res) => {
             requestId,
             duration: `${duration}ms`,
             user_id: req.body.user_id,
-            photoDataSize: req.body.photo_data ? Math.round(req.body.photo_data.length / 1024) + ' KB' : 'N/A'
+            photoDataSize: req.body.photo_data ? Math.round(req.body.photo_data.length / 1024) + ' KB' : 'N/A',
+            errorDetails: error.response?.data
         });
         
         let errorMessage = 'Unknown error occurred';
@@ -254,7 +325,7 @@ app.post('/api/send-photo', async (req, res) => {
         res.status(500).json({ 
             success: false, 
             error: errorMessage,
-            telegramError,
+            telegramError: telegramError,
             details: 'Check if BOT_TOKEN is valid and bot is started with /start',
             requestId,
             duration
@@ -307,6 +378,29 @@ app.get('/api/bot-status', async (req, res) => {
     }
 });
 
+// Новый endpoint для тестирования base64
+app.post('/api/test-base64', (req, res) => {
+    const { photo_data } = req.body;
+    
+    if (!photo_data) {
+        return res.json({
+            valid: false,
+            error: 'No photo_data provided'
+        });
+    }
+    
+    const isValid = isValidBase64(photo_data);
+    const cleaned = cleanBase64Data(photo_data);
+    
+    res.json({
+        valid: isValid,
+        originalLength: photo_data.length,
+        cleanedLength: cleaned ? cleaned.length : 0,
+        hasDataPrefix: photo_data.startsWith('data:'),
+        sample: photo_data.substring(0, 100) + '...'
+    });
+});
+
 // API для просмотра логов
 app.get('/api/logs', (req, res) => {
     try {
@@ -325,13 +419,13 @@ app.get('/api/logs', (req, res) => {
             .split('\n')
             .filter(line => line.trim())
             .map(line => JSON.parse(line))
-            .reverse(); // Новые логи первыми
+            .reverse();
 
         res.json({
             status: 'SUCCESS',
             logFile,
             totalEntries: logs.length,
-            logs: logs.slice(0, 100) // Последние 100 записей
+            logs: logs.slice(0, 100)
         });
         
     } catch (error) {
@@ -386,56 +480,15 @@ app.get('/api/test', (req, res) => {
     });
 });
 
-// Endpoint для очистки старых логов (только в development)
-if (process.env.NODE_ENV === 'development') {
-    app.delete('/api/logs', (req, res) => {
-        try {
-            const files = fs.readdirSync(logsDir);
-            let deletedCount = 0;
-            
-            files.forEach(file => {
-                if (file !== `server-${new Date().toISOString().split('T')[0]}.log`) {
-                    fs.unlinkSync(path.join(logsDir, file));
-                    deletedCount++;
-                }
-            });
-            
-            logger.warn('Logs cleared manually', { deletedCount });
-            res.json({ deletedCount, message: 'Old logs cleared' });
-        } catch (error) {
-            logger.error('Failed to clear logs', error);
-            res.status(500).json({ error: error.message });
-        }
-    });
-}
-
-// Обработка непредвиденных ошибок
-process.on('uncaughtException', (error) => {
-    logger.error('UNCAUGHT EXCEPTION - Server will shutdown', error, {
-        pid: process.pid,
-        memory: process.memoryUsage()
-    });
-    
-    // В продакшене лучше завершить процесс
-    if (process.env.NODE_ENV === 'production') {
-        process.exit(1);
-    }
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-    logger.error('UNHANDLED PROMISE REJECTION', new Error(reason), {
-        promise: promise.toString()
-    });
-});
-
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-    logger.info('Server starting', {
+    logger.info('Server starting with FIXED photo upload', {
         port: PORT,
         user: 'Alexander Gorchakov',
         user_id: 1189539923,
         environment: process.env.NODE_ENV || 'development',
-        botToken: process.env.BOT_TOKEN ? 'SET' : 'MISSING'
+        botToken: process.env.BOT_TOKEN ? 'SET' : 'MISSING',
+        fix: 'FormData with base64 cleaning'
     });
     
     console.log('🚀 === Telegram Camera Bot Server ===');
@@ -443,6 +496,7 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('👤 User: Alexander Gorchakov');
     console.log('🆔 User ID: 1189539923');
     console.log('🔑 BOT_TOKEN:', process.env.BOT_TOKEN ? '✅ SET' : '❌ MISSING');
+    console.log('🔧 FIX: FormData upload with base64 cleaning');
     console.log('🌐 Environment:', process.env.NODE_ENV || 'development');
     console.log('📊 Logs Directory:', logsDir);
     console.log('📧 Access URLs:');
