@@ -14,15 +14,22 @@
         .btn:hover { background: #006699; }
         .btn-success { background: #28a745; }
         .btn-secondary { background: #6c757d; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
         .card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
         .result { padding: 10px; border-radius: 6px; margin: 6px 0; font-family: 'Courier New', monospace; font-size: 0.8rem; white-space: pre-wrap; word-break: break-all; border-left: 4px solid; }
         .success { background: #f8fff8; color: #2d5016; border-left-color: #28a745; }
         .warning { background: #fffbf0; color: #856404; border-left-color: #ffc107; }
         .info { background: #f0f8ff; color: #004064; border-left-color: #0088cc; }
+        .error { background: #fff8f8; color: #8b0000; border-left-color: #dc3545; }
         .test-grid { display: grid; grid-template-columns: 1fr auto; gap: 6px; margin: 6px 0; align-items: center; }
         .url { font-family: 'Courier New', monospace; font-size: 0.75rem; background: #f8f9fa; padding: 5px; border-radius: 3px; word-break: break-all; }
         .summary { background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center; }
         .summary.success { background: #f8fff8; border: 2px solid #28a745; }
+        .loading { display: inline-block; width: 14px; height: 14px; border: 2px solid #f3f3f3; border-top: 2px solid #0088cc; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -36,7 +43,7 @@
         <div class="nav-buttons">
             <a href="index.html" class="btn btn-secondary">🏠 На главную</a>
             <a href="camera-app.html" class="btn">📷 Камера</a>
-            <button class="btn btn-success" onclick="testAllEndpoints()">🧪 Тестировать всё</button>
+            <button class="btn btn-success" id="testAllBtn" onclick="testAllEndpoints()">🧪 Тестировать всё</button>
             <button class="btn" onclick="testCriticalEndpoints()">🔗 Критические endpoints</button>
             <button class="btn btn-secondary" onclick="clearResults()">🗑️ Очистить</button>
         </div>
@@ -89,6 +96,7 @@
 
     <script>
         const BACKEND_URL = 'https://telegram-camera-bot-production.up.railway.app';
+        let isTesting = false;
         
         function addResult(message, type = 'info') {
             const timestamp = new Date().toLocaleTimeString();
@@ -99,14 +107,24 @@
             resultDiv.scrollIntoView({ behavior: 'smooth' });
         }
 
-        async function testEndpoint(endpoint) {
+        function setButtonLoading(button, loading) {
+            if (loading) {
+                button.dataset.originalText = button.innerHTML;
+                button.innerHTML = '<div class="loading"></div> Загрузка...';
+                button.disabled = true;
+            } else {
+                button.innerHTML = button.dataset.originalText || 'Тест';
+                button.disabled = false;
+            }
+        }
+
+        async function testEndpoint(endpoint, button = null) {
             const url = BACKEND_URL + endpoint;
             const startTime = Date.now();
-            const button = event.target;
-            const originalText = button.innerHTML;
             
-            button.innerHTML = '⏳...';
-            button.disabled = true;
+            if (button) {
+                setButtonLoading(button, true);
+            }
             
             addResult(`Тестирование: GET ${url}`, 'info');
             
@@ -125,26 +143,29 @@
                 if (response.ok) {
                     const data = await response.json();
                     addResult(`✅ УСПЕХ: ${endpoint} (${duration}ms)\nСтатус: ${data.status || 'OK'}`, 'success');
+                    return true;
                 } else {
                     addResult(`❌ ОШИБКА: HTTP ${response.status}`, 'error');
+                    return false;
                 }
             } catch (error) {
                 const duration = Date.now() - startTime;
                 addResult(`❌ ОШИБКА: ${error.message} (${duration}ms)`, 'error');
+                return false;
             } finally {
-                button.innerHTML = originalText;
-                button.disabled = false;
+                if (button) {
+                    setButtonLoading(button, false);
+                }
             }
         }
 
-        async function testPhotoEndpoint() {
+        async function testPhotoEndpoint(button = null) {
             const url = BACKEND_URL + '/api/send-photo';
             const startTime = Date.now();
-            const button = event.target;
-            const originalText = button.innerHTML;
             
-            button.innerHTML = '⏳...';
-            button.disabled = true;
+            if (button) {
+                setButtonLoading(button, true);
+            }
             
             addResult(`Тестирование: POST ${url}`, 'info');
             
@@ -171,22 +192,33 @@
                     const result = await response.json();
                     if (result.success) {
                         addResult(`✅ УСПЕХ: Фото отправлено (${duration}ms)`, 'success');
+                        return true;
                     } else {
                         addResult(`⚠️ ОШИБКА БОТА: ${result.error}`, 'warning');
+                        return false;
                     }
                 } else {
                     addResult(`❌ ОШИБКА: HTTP ${response.status}`, 'error');
+                    return false;
                 }
             } catch (error) {
                 const duration = Date.now() - startTime;
                 addResult(`❌ ОШИБКА: ${error.message} (${duration}ms)`, 'error');
+                return false;
             } finally {
-                button.innerHTML = originalText;
-                button.disabled = false;
+                if (button) {
+                    setButtonLoading(button, false);
+                }
             }
         }
         
         async function testAllEndpoints() {
+            if (isTesting) return;
+            
+            isTesting = true;
+            const testAllBtn = document.getElementById('testAllBtn');
+            setButtonLoading(testAllBtn, true);
+            
             addResult('🚀 ЗАПУСК ПОЛНОГО ТЕСТИРОВАНИЯ', 'info');
             
             const endpoints = [
@@ -196,17 +228,29 @@
                 '/api/test'
             ];
             
+            let successCount = 0;
+            let totalCount = endpoints.length + 1; // +1 для photo endpoint
+            
             for (const endpoint of endpoints) {
-                await testEndpoint(endpoint);
+                const success = await testEndpoint(endpoint);
+                if (success) successCount++;
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
             
-            await testPhotoEndpoint();
+            const photoSuccess = await testPhotoEndpoint();
+            if (photoSuccess) successCount++;
             
-            addResult('📊 ТЕСТИРОВАНИЕ ЗАВЕРШЕНО', 'success');
+            addResult(`📊 ТЕСТИРОВАНИЕ ЗАВЕРШЕНО: ${successCount}/${totalCount} успешно`, 
+                     successCount === totalCount ? 'success' : 'warning');
+            
+            setButtonLoading(testAllBtn, false);
+            isTesting = false;
         }
 
         async function testCriticalEndpoints() {
+            if (isTesting) return;
+            
+            isTesting = true;
             addResult('🔗 ТЕСТ КРИТИЧЕСКИХ ENDPOINTS', 'info');
             
             // Только самые важные endpoints
@@ -215,11 +259,24 @@
             await testEndpoint('/api/test');
             
             addResult('✅ Критические endpoints работают', 'success');
+            isTesting = false;
         }
         
         function clearResults() {
             document.getElementById('results').innerHTML = '<div class="result info">Логи очищены</div>';
         }
+
+        // Обработчики для кнопок с передачей event
+        document.addEventListener('DOMContentLoaded', function() {
+            // Назначаем обработчики для отдельных кнопок тестирования
+            const buttons = document.querySelectorAll('.test-grid .btn');
+            buttons.forEach(button => {
+                const originalOnClick = button.onclick;
+                button.onclick = function(event) {
+                    originalOnClick.call(this, event);
+                };
+            });
+        });
     </script>
 </body>
 </html>
