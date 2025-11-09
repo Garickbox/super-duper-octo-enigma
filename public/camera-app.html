@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Камера для Telegram</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #ffffff;
+            color: #212529;
+            line-height: 1.6;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 15px;
+        }
+
+        header {
+            background: #0088cc;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+            border-radius: 0 0 12px 12px;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #0088cc;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            justify-content: center;
+            margin: 5px 0;
+        }
+
+        .btn:hover {
+            background: #006699;
+        }
+
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background: #4cc9f0;
+        }
+
+        .btn-danger {
+            background: #f72585;
+        }
+
+        .camera-preview {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .camera-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .captured-image {
+            width: 100%;
+            height: 300px;
+            object-fit: contain;
+            background: #000;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .photo-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+        }
+
+        #cameraInfo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📷 Камера в Telegram</h1>
+            <p>Сфотографируйте и отправьте боту</p>
+        </header>
+
+        <div class="card">
+            <div class="camera-preview" id="cameraPreview">
+                <video id="videoElement" autoplay playsinline></video>
+                <div id="cameraInfo">Камера не активирована</div>
+            </div>
+            
+            <img id="capturedImage" class="captured-image">
+            
+            <div class="media-controls">
+                <button class="btn btn-success" id="startCameraBtn">
+                    📷 Включить камеру
+                </button>
+                <button class="btn" id="captureBtn" disabled>
+                    📸 Сделать снимок
+                </button>
+                <button class="btn btn-danger" id="stopCameraBtn" disabled>
+                    ⏹️ Выключить камеру
+                </button>
+            </div>
+        </div>
+
+        <div class="card" id="photoPreviewCard" style="display: none;">
+            <div class="photo-preview">
+                <img id="previewImage" class="preview-image">
+                <input type="text" id="photoCaption" placeholder="Добавьте подпись к фото (необязательно)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                <button class="btn btn-success" id="sendToBotBtn">
+                    ✈️ Отправить боту
+                </button>
+                <button class="btn" id="retakePhotoBtn">
+                    🔄 Переснять фото
+                </button>
+            </div>
+        </div>
+
+        <div id="statusMessage"></div>
+    </div>
+
+    <script>
+        // Инициализация Telegram Web App
+        const tg = window.Telegram.WebApp;
+        
+        // Глобальные переменные
+        let mediaStream = null;
+        let currentPhotoData = null;
+        
+        // URL вашего сервера на Render (ЗАМЕНИТЕ на ваш URL после деплоя)
+        const SERVER_URL = 'https://your-app.onrender.com/api/send-photo';
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Инициализируем Telegram Web App
+            tg.expand();
+            tg.enableClosingConfirmation();
+            
+            // Назначаем обработчики событий
+            document.getElementById('startCameraBtn').addEventListener('click', initializeCamera);
+            document.getElementById('captureBtn').addEventListener('click', captureImage);
+            document.getElementById('stopCameraBtn').addEventListener('click', stopCamera);
+            document.getElementById('sendToBotBtn').addEventListener('click', sendPhotoToBot);
+            document.getElementById('retakePhotoBtn').addEventListener('click', retakePhoto);
+            
+            // Показываем информацию о пользователе
+            showUserInfo();
+        });
+        
+        // Показать информацию о пользователе
+        function showUserInfo() {
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                const userName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                document.getElementById('cameraInfo').textContent = `Привет, ${userName}! Нажми "Включить камеру"`;
+            }
+        }
+        
+        // Инициализация камеры
+        async function initializeCamera() {
+            try {
+                // Останавливаем предыдущий поток, если есть
+                if (mediaStream) {
+                    stopCamera();
+                }
+                
+                // Запрос доступа к камере
+                const constraints = {
+                    video: { 
+                        facingMode: "environment",
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                };
+                
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                const videoElement = document.getElementById('videoElement');
+                videoElement.srcObject = mediaStream;
+                
+                // Обновляем информацию о камере
+                document.getElementById('cameraInfo').style.display = 'none';
+                
+                // Активируем кнопки
+                document.getElementById('startCameraBtn').disabled = true;
+                document.getElementById('captureBtn').disabled = false;
+                document.getElementById('stopCameraBtn').disabled = false;
+                
+                showStatus('Камера успешно активирована ✅', 'success');
+                
+            } catch (error) {
+                console.error('Ошибка доступа к камере:', error);
+                showStatus('Не удалось получить доступ к камере. Проверьте разрешения.', 'error');
+            }
+        }
+        
+        // Снимок с камеры
+        function captureImage() {
+            const videoElement = document.getElementById('videoElement');
+            const capturedImage = document.getElementById('capturedImage');
+            const previewImage = document.getElementById('previewImage');
+            
+            // Создаем canvas для захвата кадра
+            const canvas = document.createElement('canvas');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            
+            const context = canvas.getContext('2d');
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            
+            // Сохраняем изображение в формате Data URL (сжатое JPEG)
+            currentPhotoData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Показываем превью
+            capturedImage.src = currentPhotoData;
+            capturedImage.style.display = 'block';
+            previewImage.src = currentPhotoData;
+            
+            // Скрываем видео, показываем превью
+            videoElement.style.display = 'none';
+            document.getElementById('photoPreviewCard').style.display = 'block';
+            
+            showStatus('Фото готово к отправке 📸', 'success');
+        }
+        
+        // Переснять фото
+        function retakePhoto() {
+            const videoElement = document.getElementById('videoElement');
+            const capturedImage = document.getElementById('capturedImage');
+            
+            // Скрываем превью, показываем видео
+            capturedImage.style.display = 'none';
+            videoElement.style.display = 'block';
+            document.getElementById('photoPreviewCard').style.display = 'none';
+            
+            currentPhotoData = null;
+            showStatus('Сделайте новый снимок', 'success');
+        }
+        
+        // Остановка камеры
+        function stopCamera() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+            
+            const videoElement = document.getElementById('videoElement');
+            videoElement.srcObject = null;
+            
+            // Деактивируем кнопки
+            document.getElementById('startCameraBtn').disabled = false;
+            document.getElementById('captureBtn').disabled = true;
+            document.getElementById('stopCameraBtn').disabled = true;
+            
+            // Сбрасываем отображение
+            document.getElementById('cameraInfo').style.display = 'block';
+            document.getElementById('cameraInfo').textContent = 'Камера не активирована';
+            
+            showStatus('Камера выключена', 'success');
+        }
+        
+        // Отправка фото боту
+        async function sendPhotoToBot() {
+            if (!currentPhotoData) {
+                showStatus('Нет фото для отправки', 'error');
+                return;
+            }
+            
+            showStatus('Отправка фото боту...', 'success');
+            
+            // Получаем user_id из Telegram Web App
+            const user = tg.initDataUnsafe?.user;
+            if (!user) {
+                showStatus('Ошибка: не удалось определить пользователя', 'error');
+                return;
+            }
+            
+            const caption = document.getElementById('photoCaption').value;
+            
+            try {
+                // Отправляем на сервер
+                const result = await sendPhotoToServer(currentPhotoData, user.id, caption);
+                
+                if (result.success) {
+                    showStatus('✅ Фото успешно отправлено боту!', 'success');
+                    
+                    // Закрываем приложение через 2 секунды
+                    setTimeout(() => {
+                        tg.close();
+                    }, 2000);
+                } else {
+                    showStatus('Ошибка отправки фото: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка отправки фото:', error);
+                showStatus('Ошибка отправки фото: ' + error.message, 'error');
+            }
+        }
+        
+        // Отправка фото на сервер
+        async function sendPhotoToServer(photoData, userId, caption = '') {
+            const response = await fetch(SERVER_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    photo_data: photoData,
+                    caption: caption
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return await response.json();
+        }
+        
+        // Показать статус
+        function showStatus(message, type) {
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.textContent = message;
+            statusElement.className = 'status-message';
+            
+            if (type === 'success') {
+                statusElement.classList.add('status-success');
+            } else if (type === 'error') {
+                statusElement.classList.add('status-error');
+            }
+            
+            // Автоматически скрыть через 5 секунд
+            setTimeout(() => {
+                statusElement.textContent = '';
+                statusElement.className = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
