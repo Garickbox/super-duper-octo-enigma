@@ -32,6 +32,7 @@
             text-align: center;
             margin-bottom: 15px;
             border-radius: 0 0 12px 12px;
+            position: relative;
         }
 
         h1 {
@@ -327,8 +328,8 @@
         let mediaStream = null;
         let currentPhotoData = null;
         
-        // URL вашего сервера - ЗАМЕНИТЕ НА АКТУАЛЬНЫЙ URL БЭКЕНДА
-        const SERVER_URL = 'https://your-backend-url.railway.app/api/send-photo';
+        // URL вашего сервера на Railway
+        const SERVER_URL = 'https://telegram-camera-bot-production.up.railway.app/api/send-photo';
         
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
