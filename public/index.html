@@ -21,6 +21,7 @@
             --warning: #fbbf24;
             --error: #f87171;
             --btn-camera: #0088cc;
+            --api-color: #ff6b35;
         }
         
         /* Тема 1: Стандартная (синяя) */
@@ -28,6 +29,7 @@
             --bg-primary: #667eea;
             --bg-secondary: #764ba2;
             --btn-camera: #0088cc;
+            --api-color: #ff6b35;
         }
         
         /* Тема 2: Зеленая */
@@ -35,6 +37,7 @@
             --bg-primary: #10b981;
             --bg-secondary: #047857;
             --btn-camera: #059669;
+            --api-color: #ff6b35;
         }
         
         /* Тема 3: Ночной режим */
@@ -44,6 +47,7 @@
             --btn-camera: #334155;
             --text-primary: #e2e8f0;
             --card-bg: rgba(30, 41, 59, 0.8);
+            --api-color: #ff6b35;
         }
         
         /* Тема 4: Светлая */
@@ -53,6 +57,7 @@
             --btn-camera: #3b82f6;
             --text-primary: #1e293b;
             --card-bg: rgba(255, 255, 255, 0.9);
+            --api-color: #ff6b35;
         }
         
         body {
@@ -89,6 +94,36 @@
             opacity: 0.9;
         }
         
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .theme-toggle {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .clock {
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: rgba(255,255,255,0.15);
+            padding: 8px 16px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
         /* Статус карточки - компактные */
         .status-cards {
             display: grid;
@@ -122,6 +157,11 @@
             background: rgba(251, 191, 36, 0.1);
         }
         
+        .status-card.status-api {
+            border-color: var(--api-color);
+            background: rgba(255, 107, 53, 0.1);
+        }
+        
         .status-icon {
             font-size: 1.5rem;
             margin-bottom: 8px;
@@ -136,6 +176,9 @@
         .status-value {
             font-size: 0.9rem;
             font-weight: 600;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
         }
         
         /* Основные кнопки - только камера */
@@ -173,7 +216,7 @@
         
         /* Быстрые действия - компактные */
         .quick-actions {
-            margin-top: auto; /* Это переместит чипсы вниз */
+            margin-top: auto;
             margin-bottom: 20px;
         }
         
@@ -270,23 +313,6 @@
         .log-info { border-left-color: var(--success); }
         .log-error { border-left-color: var(--error); }
         .log-warn { border-left-color: var(--warning); }
-        
-        /* Controls */
-        .controls {
-            display: flex;
-            justify-content: center;
-            margin: 15px 0;
-        }
-        
-        .theme-toggle {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: var(--text-primary);
-            padding: 8px 16px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
         
         /* Overlay */
         .overlay {
@@ -389,6 +415,16 @@
                 padding: 6px 12px;
                 font-size: 0.75rem;
             }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .theme-toggle, .clock {
+                width: 100%;
+                justify-content: center;
+            }
         }
         
         @media (max-width: 360px) {
@@ -423,7 +459,10 @@
 
         <!-- Controls -->
         <div class="controls">
-            <button class="theme-toggle" onclick="cycleTheme()">🌙 Тема</button>
+            <button class="theme-toggle" onclick="cycleTheme()">
+                🌙 Тема
+            </button>
+            <div class="clock" id="clock">--:--:--</div>
         </div>
 
         <!-- Основная кнопка - только камера -->
@@ -440,21 +479,21 @@
                 <div class="status-icon">🔄</div>
                 <div class="status-text">
                     <div class="status-title">СИСТЕМА</div>
-                    <div class="status-value" id="systemStatus">...</div>
+                    <div class="status-value" id="systemStatus"></div>
                 </div>
             </div>
-            <div class="status-card" id="apiStatusCard">
+            <div class="status-card status-api" id="apiStatusCard">
                 <div class="status-icon">⚡</div>
                 <div class="status-text">
                     <div class="status-title">API</div>
-                    <div class="status-value" id="backendStatus">...</div>
+                    <div class="status-value" id="backendStatus"></div>
                 </div>
             </div>
             <div class="status-card" id="botStatusCard">
                 <div class="status-icon">🤖</div>
                 <div class="status-text">
                     <div class="status-title">БОТ</div>
-                    <div class="status-value" id="botStatus">...</div>
+                    <div class="status-value" id="botStatus"></div>
                 </div>
             </div>
         </div>
@@ -492,11 +531,22 @@
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
             loadTheme();
+            updateClock();
             checkSystemStatus();
             
-            // Авто-обновление каждые 30 секунд
+            // Обновление времени каждую секунду
+            setInterval(updateClock, 1000);
+            
+            // Авто-обновление статуса каждые 30 секунд
             monitoringInterval = setInterval(checkSystemStatus, 30000);
         });
+
+        // Обновление часов
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ru-RU');
+            document.getElementById('clock').textContent = timeString;
+        }
 
         // Циклическое переключение тем
         function cycleTheme() {
@@ -583,9 +633,9 @@
 
                 // Обновляем статус API
                 if (backendResponse.status === 'fulfilled' && backendResponse.value.ok) {
-                    updateStatus('backend', 'OK', 'success');
+                    updateStatus('backend', 'success');
                 } else {
-                    updateStatus('backend', 'ERR', 'error');
+                    updateStatus('backend', 'error');
                     apiOk = false;
                     systemOk = false;
                 }
@@ -594,42 +644,47 @@
                 if (botResponse.status === 'fulfilled' && botResponse.value.ok) {
                     const data = await botResponse.value.json();
                     if (data.status === 'ACTIVE') {
-                        updateStatus('bot', 'OK', 'success');
+                        updateStatus('bot', 'success');
                     } else {
-                        updateStatus('bot', 'ERR', 'error');
+                        updateStatus('bot', 'error');
                         botOk = false;
                         systemOk = false;
                     }
                 } else {
-                    updateStatus('bot', 'ERR', 'error');
+                    updateStatus('bot', 'error');
                     botOk = false;
                     systemOk = false;
                 }
 
                 // Обновляем системный статус
                 if (systemOk) {
-                    updateStatus('system', 'OK', 'success');
+                    updateStatus('system', 'success');
                 } else {
-                    updateStatus('system', 'ERR', apiOk && !botOk ? 'warning' : 'error');
+                    updateStatus('system', apiOk && !botOk ? 'warning' : 'error');
                 }
                 
             } catch (error) {
-                updateStatus('system', 'ERR', 'error');
-                updateStatus('backend', 'ERR', 'error');
-                updateStatus('bot', 'ERR', 'error');
+                updateStatus('system', 'error');
+                updateStatus('backend', 'error');
+                updateStatus('bot', 'error');
             }
         }
 
-        function updateStatus(type, text, status) {
-            const element = document.getElementById(`${type}Status`);
+        function updateStatus(type, status) {
             const card = document.getElementById(`${type}StatusCard`);
             
-            if (element) element.textContent = text;
             if (card) {
                 // Убираем все классы статусов
                 card.classList.remove('status-success', 'status-error', 'status-warning');
+                
                 // Добавляем нужный класс
-                card.classList.add(`status-${status}`);
+                if (status === 'success') {
+                    card.classList.add('status-success');
+                } else if (status === 'warning') {
+                    card.classList.add('status-warning');
+                } else {
+                    card.classList.add('status-error');
+                }
             }
         }
 
