@@ -105,7 +105,8 @@
         
         /* Выбор класса */
         .class-section {
-            margin-bottom: 25px;
+            margin-bottom: auto;
+            padding: 20px 0;
         }
         
         .class-dropdown {
@@ -165,56 +166,6 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
-        }
-        
-        /* Status Cards */
-        .status-cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-        
-        .status-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 14px;
-            padding: 15px;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            min-height: 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .status-card.status-success {
-            border-color: var(--success);
-            background: rgba(74, 222, 128, 0.1);
-        }
-        
-        .status-card.status-error {
-            border-color: var(--error);
-            background: rgba(248, 113, 113, 0.1);
-        }
-        
-        .status-card.status-warning {
-            border-color: var(--warning);
-            background: rgba(251, 191, 36, 0.1);
-        }
-        
-        .status-title {
-            font-size: 12px;
-            opacity: 0.8;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        
-        .status-value {
-            font-size: 16px;
-            font-weight: 600;
         }
         
         /* Чипсы внизу страницы */
@@ -303,11 +254,6 @@
                 min-height: 65px;
             }
             
-            .status-card {
-                padding: 12px 8px;
-                min-height: 75px;
-            }
-            
             .chip {
                 padding: 14px 12px;
                 font-size: 14px;
@@ -320,18 +266,6 @@
         }
         
         @media (max-width: 360px) {
-            .status-cards {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-            
-            .status-card {
-                flex-direction: row;
-                justify-content: space-between;
-                text-align: left;
-                padding: 12px 15px;
-            }
-            
             .bottom-chips {
                 flex-direction: column;
             }
@@ -372,22 +306,6 @@
             </button>
         </div>
 
-        <!-- Status Cards -->
-        <div class="status-cards">
-            <div class="status-card status-error" id="systemStatusCard">
-                <div class="status-title">СИСТЕМА</div>
-                <div class="status-value" id="systemStatus">ERR</div>
-            </div>
-            <div class="status-card status-error" id="apiStatusCard">
-                <div class="status-title">API</div>
-                <div class="status-value" id="backendStatus">ERR</div>
-            </div>
-            <div class="status-card status-error" id="botStatusCard">
-                <div class="status-title">БОТ</div>
-                <div class="status-value" id="botStatus">ERR</div>
-            </div>
-        </div>
-
         <!-- Чипсы внизу страницы -->
         <div class="bottom-chips">
             <button class="chip" onclick="refreshAll()">
@@ -404,7 +322,6 @@
     <div class="toast" id="toast" style="display: none;"></div>
 
     <script>
-        const BACKEND_URL = 'https://telegram-camera-bot-production.up.railway.app';
         let selectedClass = "";
         
         // Темы по порядку
@@ -415,7 +332,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadTheme();
             updateClock();
-            checkSystemStatus();
             
             // Обновление времени каждую секунду
             setInterval(updateClock, 1000);
@@ -507,74 +423,8 @@
         }
 
         function refreshAll() {
-            showNotification('Обновление...');
-            checkSystemStatus();
-        }
-
-        // Статус системы
-        async function checkSystemStatus() {
-            try {
-                const [backendResponse, botResponse] = await Promise.allSettled([
-                    fetch(BACKEND_URL + '/api/test'),
-                    fetch(BACKEND_URL + '/api/bot-status')
-                ]);
-
-                let systemOk = true;
-                let apiOk = true;
-                let botOk = true;
-
-                // Обновляем статус API
-                if (backendResponse.status === 'fulfilled' && backendResponse.value.ok) {
-                    updateStatus('backend', 'OK', 'success');
-                    apiOk = true;
-                } else {
-                    updateStatus('backend', 'ERR', 'error');
-                    apiOk = false;
-                }
-
-                // Обновляем статус бота
-                if (botResponse.status === 'fulfilled' && botResponse.value.ok) {
-                    const data = await botResponse.value.json();
-                    if (data.status === 'ACTIVE') {
-                        updateStatus('bot', 'OK', 'success');
-                        botOk = true;
-                    } else {
-                        updateStatus('bot', 'ERR', 'error');
-                        botOk = false;
-                    }
-                } else {
-                    updateStatus('bot', 'ERR', 'error');
-                    botOk = false;
-                }
-
-                // Обновляем системный статус
-                if (apiOk && botOk) {
-                    updateStatus('system', 'OK', 'success');
-                } else {
-                    updateStatus('system', 'ERR', 'error');
-                }
-
-                showNotification('Статус обновлен', 'success');
-                
-            } catch (error) {
-                updateStatus('system', 'ERR', 'error');
-                updateStatus('backend', 'ERR', 'error');
-                updateStatus('bot', 'ERR', 'error');
-                showNotification('Ошибка проверки статуса', 'error');
-            }
-        }
-
-        function updateStatus(type, text, status) {
-            const element = document.getElementById(`${type}Status`);
-            const card = document.getElementById(`${type}StatusCard`);
-            
-            if (element) element.textContent = text;
-            if (card) {
-                // Убираем все классы статусов
-                card.classList.remove('status-success', 'status-error', 'status-warning');
-                // Добавляем нужный класс
-                card.classList.add(`status-${status}`);
-            }
+            showNotification('Обновление интерфейса');
+            // Можно добавить дополнительную логику обновления если нужно
         }
     </script>
 </body>
