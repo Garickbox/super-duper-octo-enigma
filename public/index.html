@@ -178,7 +178,7 @@
             100% { left: 100%; }
         }
         
-        /* Status Cards - компактные как на картинке */
+        /* Status Cards */
         .status-cards {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -228,23 +228,22 @@
             font-weight: 600;
         }
         
-        /* System Actions */
-        .system-actions {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+        /* System Controls */
+        .system-controls {
+            display: flex;
             gap: 10px;
+            align-items: center;
         }
         
-        .system-btn {
+        .refresh-btn {
             background: var(--card-bg);
             backdrop-filter: blur(10px);
             border: 2px solid rgba(255,255,255,0.2);
             border-radius: 14px;
-            padding: 18px 12px;
+            padding: 15px;
             color: var(--text-primary);
             cursor: pointer;
             transition: all 0.3s ease;
-            text-align: center;
             font-size: 15px;
             font-weight: 500;
             min-height: 60px;
@@ -253,9 +252,34 @@
             justify-content: center;
             align-items: center;
             gap: 5px;
+            flex: 1;
         }
         
-        .system-btn:hover {
+        .refresh-btn:hover {
+            background: var(--btn-camera);
+            border-color: var(--btn-camera);
+        }
+        
+        .system-chip {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 15px 20px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 60px;
+        }
+        
+        .system-chip:hover {
             background: var(--btn-camera);
             border-color: var(--btn-camera);
         }
@@ -263,89 +287,6 @@
         .system-icon {
             font-size: 20px;
         }
-        
-        /* Results Window */
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-            z-index: 999;
-        }
-        
-        .results-window {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 400px;
-            max-height: 70vh;
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 20px;
-            z-index: 1000;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-        
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .results-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 5px;
-        }
-        
-        .results-content {
-            max-height: calc(70vh - 100px);
-            overflow-y: auto;
-        }
-        
-        /* Логи */
-        .log-entry {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 12px;
-            margin: 6px 0;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            word-break: break-all;
-            overflow-wrap: break-word;
-            border-left: 4px solid;
-        }
-        
-        .log-timestamp {
-            color: rgba(255,255,255,0.6);
-            font-size: 10px;
-            display: block;
-            margin-bottom: 3px;
-        }
-        
-        .log-info { border-left-color: var(--success); }
-        .log-error { border-left-color: var(--error); }
-        .log-warn { border-left-color: var(--warning); }
         
         /* Toast */
         .toast {
@@ -417,8 +358,9 @@
                 min-height: 75px;
             }
             
-            .system-btn {
-                padding: 16px 10px;
+            .refresh-btn,
+            .system-chip {
+                padding: 14px 12px;
                 font-size: 14px;
                 min-height: 55px;
             }
@@ -441,8 +383,8 @@
                 padding: 12px 15px;
             }
             
-            .system-actions {
-                grid-template-columns: 1fr;
+            .system-controls {
+                flex-direction: column;
             }
         }
     </style>
@@ -497,32 +439,16 @@
             </div>
         </div>
 
-        <!-- System Actions -->
-        <div class="system-actions">
-            <button class="system-btn" onclick="showResults('test')">
-                <span class="system-icon">🔧</span>
-                <span>Тест</span>
-            </button>
-            <button class="system-btn" onclick="showResults('logs')">
-                <span class="system-icon">📊</span>
-                <span>Лог</span>
-            </button>
-            <button class="system-btn" onclick="refreshAll()">
+        <!-- System Controls -->
+        <div class="system-controls">
+            <button class="refresh-btn" onclick="refreshAll()">
                 <span class="system-icon">🔄</span>
                 <span>Обновить</span>
             </button>
-        </div>
-    </div>
-
-    <!-- Results Window -->
-    <div class="overlay" id="overlay" onclick="closeResults()"></div>
-    <div class="results-window" id="resultsWindow">
-        <div class="results-header">
-            <div class="results-title" id="resultsTitle">Результаты</div>
-            <button class="close-btn" onclick="closeResults()">×</button>
-        </div>
-        <div class="results-content" id="resultsContent">
-            <!-- Контент будет здесь -->
+            <a href="SYS.html" class="system-chip">
+                <span class="system-icon">⚙️</span>
+                <span>Система</span>
+            </a>
         </div>
     </div>
 
@@ -629,32 +555,6 @@
             document.getElementById('lastUpdate').textContent = time;
         }
 
-        // Окно результатов
-        function showResults(type) {
-            const overlay = document.getElementById('overlay');
-            const window = document.getElementById('resultsWindow');
-            const title = document.getElementById('resultsTitle');
-            const content = document.getElementById('resultsContent');
-            
-            overlay.style.display = 'block';
-            window.style.display = 'block';
-            
-            if (type === 'test') {
-                title.textContent = '🔧 Тест системы';
-                content.innerHTML = '<div class="log-entry">Запуск тестов...</div>';
-                runTests();
-            } else if (type === 'logs') {
-                title.textContent = '📊 Логи системы';
-                content.innerHTML = '<div class="log-entry">Загрузка логов...</div>';
-                loadLogs();
-            }
-        }
-
-        function closeResults() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('resultsWindow').style.display = 'none';
-        }
-
         function refreshAll() {
             showNotification('Обновление...');
             checkSystemStatus();
@@ -725,148 +625,6 @@
                 card.classList.remove('status-success', 'status-error', 'status-warning');
                 // Добавляем нужный класс
                 card.classList.add(`status-${status}`);
-            }
-        }
-
-        // Тестирование
-        async function runTests() {
-            const content = document.getElementById('resultsContent');
-            const endpoints = [
-                { path: '/api/bot-status', name: 'Статус бота' },
-                { path: '/api/stats', name: 'Статистика' },
-                { path: '/api/test', name: 'Тест API' },
-                { path: '/api/logs', name: 'Логи' }
-            ];
-            
-            let successCount = 0;
-            let resultsHTML = '';
-            
-            for (let i = 0; i < endpoints.length; i++) {
-                const endpoint = endpoints[i];
-                
-                const result = await testEndpoint(endpoint.path);
-                if (result.success) successCount++;
-                
-                resultsHTML += result.html;
-                content.innerHTML = resultsHTML;
-                content.scrollTop = content.scrollHeight;
-                
-                await new Promise(resolve => setTimeout(resolve, 300));
-            }
-            
-            const totalTests = endpoints.length;
-            const summaryType = successCount === totalTests ? 'info' : successCount >= totalTests - 1 ? 'warn' : 'error';
-            const summaryText = successCount === totalTests ? 
-                `✅ Все тесты пройдены (${successCount}/${totalTests})` :
-                successCount >= totalTests - 1 ?
-                `⚠️ Пройдено ${successCount}/${totalTests}` :
-                `❌ Ошибки: ${successCount}/${totalTests}`;
-            
-            resultsHTML += `
-                <div class="log-entry log-${summaryType}">
-                    ${summaryText}
-                </div>
-            `;
-            
-            content.innerHTML = resultsHTML;
-        }
-
-        async function testEndpoint(endpoint) {
-            const startTime = Date.now();
-            const name = endpoint.split('/').pop();
-            
-            try {
-                const response = await fetch(BACKEND_URL + endpoint, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                const duration = Date.now() - startTime;
-                
-                if (response.ok) {
-                    return {
-                        success: true,
-                        html: `
-                            <div class="log-entry log-info">
-                                <span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span>
-                                ✅ ${name} (${duration}ms)
-                            </div>
-                        `
-                    };
-                } else {
-                    return {
-                        success: false,
-                        html: `
-                            <div class="log-entry log-error">
-                                <span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span>
-                                ❌ ${name} - HTTP ${response.status}
-                            </div>
-                        `
-                    };
-                }
-            } catch (error) {
-                const duration = Date.now() - startTime;
-                return {
-                    success: false,
-                    html: `
-                        <div class="log-entry log-error">
-                            <span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span>
-                            ❌ ${name} - ${error.message} (${duration}ms)
-                        </div>
-                    `
-                };
-            }
-        }
-
-        // Логи
-        async function loadLogs() {
-            const content = document.getElementById('resultsContent');
-            
-            try {
-                const response = await fetch(BACKEND_URL + '/api/logs', {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (data.status === 'SUCCESS') {
-                    let logsHTML = '';
-                    const recentLogs = data.logs.slice(0, 20); // Последние 20 логов
-                    
-                    if (recentLogs.length === 0) {
-                        logsHTML = '<div class="log-entry">Логи отсутствуют</div>';
-                    } else {
-                        recentLogs.forEach(log => {
-                            const time = new Date(log.timestamp).toLocaleTimeString();
-                            const shortMessage = log.message.length > 100 ? log.message.substring(0, 100) + '...' : log.message;
-                            
-                            logsHTML += `
-                                <div class="log-entry log-${log.level.toLowerCase()}">
-                                    <span class="log-timestamp">[${time}]</span>
-                                    ${log.level}: ${shortMessage}
-                                </div>
-                            `;
-                        });
-                    }
-                    
-                    content.innerHTML = logsHTML;
-                } else {
-                    content.innerHTML = `<div class="log-entry log-error">Ошибка: ${data.message}</div>`;
-                }
-            } catch (error) {
-                content.innerHTML = `<div class="log-entry log-error">❌ Ошибка: ${error.message}</div>`;
             }
         }
 
