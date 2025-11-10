@@ -52,6 +52,9 @@
         .container {
             max-width: 400px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 40px);
         }
         
         .header {
@@ -93,9 +96,11 @@
             transition: all 0.3s ease;
         }
         
-        .last-update {
+        .current-time {
             font-size: 14px;
             opacity: 0.7;
+            font-weight: 500;
+            letter-spacing: 1px;
         }
         
         /* Выбор класса */
@@ -162,22 +167,6 @@
             box-shadow: none;
         }
         
-        .class-btn:disabled::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: shimmer 1.5s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        
         /* Status Cards */
         .status-cards {
             display: grid;
@@ -228,39 +217,15 @@
             font-weight: 600;
         }
         
-        /* System Controls */
-        .system-controls {
+        /* Чипсы внизу страницы */
+        .bottom-chips {
             display: flex;
             gap: 10px;
-            align-items: center;
+            margin-top: auto;
+            padding-top: 20px;
         }
         
-        .refresh-btn {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 14px;
-            padding: 15px;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 15px;
-            font-weight: 500;
-            min-height: 60px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-            flex: 1;
-        }
-        
-        .refresh-btn:hover {
-            background: var(--btn-camera);
-            border-color: var(--btn-camera);
-        }
-        
-        .system-chip {
+        .chip {
             background: var(--card-bg);
             backdrop-filter: blur(10px);
             border: 2px solid rgba(255,255,255,0.2);
@@ -276,15 +241,16 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            flex: 1;
             min-height: 60px;
         }
         
-        .system-chip:hover {
+        .chip:hover {
             background: var(--btn-camera);
             border-color: var(--btn-camera);
         }
         
-        .system-icon {
+        .chip-icon {
             font-size: 20px;
         }
         
@@ -311,22 +277,6 @@
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid var(--btn-camera);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            vertical-align: middle;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
         
         /* Мобильная адаптация */
@@ -358,14 +308,13 @@
                 min-height: 75px;
             }
             
-            .refresh-btn,
-            .system-chip {
+            .chip {
                 padding: 14px 12px;
                 font-size: 14px;
                 min-height: 55px;
             }
             
-            .system-icon {
+            .chip-icon {
                 font-size: 18px;
             }
         }
@@ -383,7 +332,7 @@
                 padding: 12px 15px;
             }
             
-            .system-controls {
+            .bottom-chips {
                 flex-direction: column;
             }
         }
@@ -403,7 +352,7 @@
                 <span>🌙</span>
                 <span>Тема</span>
             </button>
-            <div class="last-update" id="lastUpdate">--:--:--</div>
+            <div class="current-time" id="currentTime">--:--:--</div>
         </div>
 
         <!-- Выбор класса -->
@@ -425,28 +374,28 @@
 
         <!-- Status Cards -->
         <div class="status-cards">
-            <div class="status-card status-success" id="systemStatusCard">
+            <div class="status-card status-error" id="systemStatusCard">
                 <div class="status-title">СИСТЕМА</div>
-                <div class="status-value" id="systemStatus">OK</div>
+                <div class="status-value" id="systemStatus">ERR</div>
             </div>
-            <div class="status-card status-success" id="apiStatusCard">
+            <div class="status-card status-error" id="apiStatusCard">
                 <div class="status-title">API</div>
-                <div class="status-value" id="backendStatus">OK</div>
+                <div class="status-value" id="backendStatus">ERR</div>
             </div>
-            <div class="status-card status-success" id="botStatusCard">
+            <div class="status-card status-error" id="botStatusCard">
                 <div class="status-title">БОТ</div>
-                <div class="status-value" id="botStatus">OK</div>
+                <div class="status-value" id="botStatus">ERR</div>
             </div>
         </div>
 
-        <!-- System Controls -->
-        <div class="system-controls">
-            <button class="refresh-btn" onclick="refreshAll()">
-                <span class="system-icon">🔄</span>
+        <!-- Чипсы внизу страницы -->
+        <div class="bottom-chips">
+            <button class="chip" onclick="refreshAll()">
+                <span class="chip-icon">🔄</span>
                 <span>Обновить</span>
             </button>
-            <a href="SYS.html" class="system-chip">
-                <span class="system-icon">⚙️</span>
+            <a href="SYS.html" class="chip">
+                <span class="chip-icon">⚙️</span>
                 <span>Система</span>
             </a>
         </div>
@@ -457,7 +406,6 @@
     <script>
         const BACKEND_URL = 'https://telegram-camera-bot-production.up.railway.app';
         let selectedClass = "";
-        let monitoringInterval;
         
         // Темы по порядку
         const themes = ['standard', 'light', 'dark'];
@@ -466,8 +414,11 @@
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
             loadTheme();
+            updateClock();
             checkSystemStatus();
-            updateLastRefreshTime();
+            
+            // Обновление времени каждую секунду
+            setInterval(updateClock, 1000);
             
             // Инициализация выбора класса
             const classSelect = document.getElementById('classSelect');
@@ -507,10 +458,16 @@
                     }, 2000);
                 }, 1000);
             });
-            
-            // Авто-обновление каждые 30 секунд
-            monitoringInterval = setInterval(checkSystemStatus, 30000);
         });
+
+        // Обновление часов
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}:${seconds}`;
+        }
 
         // Циклическое переключение тем
         function cycleTheme() {
@@ -549,12 +506,6 @@
             }, 2000);
         }
 
-        // Время обновления
-        function updateLastRefreshTime() {
-            const time = new Date().toLocaleTimeString();
-            document.getElementById('lastUpdate').textContent = time;
-        }
-
         function refreshAll() {
             showNotification('Обновление...');
             checkSystemStatus();
@@ -575,10 +526,10 @@
                 // Обновляем статус API
                 if (backendResponse.status === 'fulfilled' && backendResponse.value.ok) {
                     updateStatus('backend', 'OK', 'success');
+                    apiOk = true;
                 } else {
                     updateStatus('backend', 'ERR', 'error');
                     apiOk = false;
-                    systemOk = false;
                 }
 
                 // Обновляем статус бота
@@ -586,25 +537,23 @@
                     const data = await botResponse.value.json();
                     if (data.status === 'ACTIVE') {
                         updateStatus('bot', 'OK', 'success');
+                        botOk = true;
                     } else {
                         updateStatus('bot', 'ERR', 'error');
                         botOk = false;
-                        systemOk = false;
                     }
                 } else {
                     updateStatus('bot', 'ERR', 'error');
                     botOk = false;
-                    systemOk = false;
                 }
 
                 // Обновляем системный статус
-                if (systemOk) {
+                if (apiOk && botOk) {
                     updateStatus('system', 'OK', 'success');
                 } else {
-                    updateStatus('system', 'ERR', apiOk && !botOk ? 'warning' : 'error');
+                    updateStatus('system', 'ERR', 'error');
                 }
 
-                updateLastRefreshTime();
                 showNotification('Статус обновлен', 'success');
                 
             } catch (error) {
@@ -627,13 +576,6 @@
                 card.classList.add(`status-${status}`);
             }
         }
-
-        // Очистка
-        window.addEventListener('beforeunload', () => {
-            if (monitoringInterval) {
-                clearInterval(monitoringInterval);
-            }
-        });
     </script>
 </body>
 </html>
