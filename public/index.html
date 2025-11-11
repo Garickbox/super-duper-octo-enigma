@@ -22,6 +22,7 @@
             --error: #f87171;
             --btn-camera: #0088cc;
             --btn-game: #e91e63;
+            --btn-space: #9c27b0;
         }
         
         /* Светлая тема */
@@ -32,6 +33,7 @@
             --card-bg: rgba(255, 255, 255, 0.9);
             --btn-camera: #0088cc;
             --btn-game: #e91e63;
+            --btn-space: #9c27b0;
         }
         
         /* Темная тема */
@@ -42,6 +44,7 @@
             --card-bg: rgba(30, 41, 59, 0.9);
             --btn-camera: #0088cc;
             --btn-game: #e91e63;
+            --btn-space: #9c27b0;
         }
         
         body {
@@ -159,9 +162,9 @@
             min-height: 70px;
         }
         
-        /* Новая кнопка игры */
+        /* Кнопка игры */
         .game-btn {
-            background: var(--btn-game);
+            background: var(--btn-space);
             color: white;
             border: none;
             border-radius: 16px;
@@ -205,6 +208,14 @@
             margin-bottom: 15px;
             text-align: center;
             opacity: 0.9;
+        }
+        
+        .game-description {
+            font-size: 14px;
+            text-align: center;
+            opacity: 0.7;
+            margin-bottom: 15px;
+            line-height: 1.4;
         }
         
         /* Чипсы внизу страницы */
@@ -304,6 +315,14 @@
             .chip-icon {
                 font-size: 18px;
             }
+            
+            .games-title {
+                font-size: 17px;
+            }
+            
+            .game-description {
+                font-size: 13px;
+            }
         }
         
         @media (max-width: 360px) {
@@ -347,12 +366,13 @@
             </button>
         </div>
 
-        <!-- Новый раздел с играми -->
+        <!-- Раздел с играми -->
         <div class="games-section">
-            <div class="games-title">Мини-игры</div>
+            <div class="games-title">Образовательные игры</div>
+            <p class="game-description">Развивай математические навыки в увлекательной форме</p>
             <button class="game-btn" id="gameBtn">
-                <span>🎮</span>
-                <span>Открыть игру</span>
+                <span>🚀</span>
+                <span>КОСМИЧЕСКИЙ ЗАЩИТНИК</span>
             </button>
         </div>
 
@@ -425,21 +445,20 @@
                 }, 1000);
             });
 
-            // Новая кнопка игры
+            // Кнопка игры "КОСМИЧЕСКИЙ ЗАЩИТНИК"
             const gameBtn = document.getElementById('gameBtn');
             gameBtn.addEventListener('click', function() {
                 // Анимация кнопки
                 const originalText = this.innerHTML;
-                this.innerHTML = '<span>🎯</span><span>Загрузка игры...</span>';
+                this.innerHTML = '<span>🛰️</span><span>Запуск игры...</span>';
                 this.disabled = true;
                 
                 // Задержка для демонстрации анимации
                 setTimeout(() => {
-                    showNotification('Загрузка игры...', 'success');
+                    showNotification('Запуск КОСМИЧЕСКОГО ЗАЩИТНИКА!', 'success');
                     
                     // Переход на страницу игры
-                    // Можно заменить на реальный URL игры
-                    const gamePage = 'game.html';
+                    const gamePage = 'math-game.html';
                     window.location.href = gamePage;
                     
                     // Если игра не загружается, возвращаем кнопку в исходное состояние
