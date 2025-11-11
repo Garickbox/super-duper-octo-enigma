@@ -1,0 +1,702 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Космический защитник</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: #000;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 80vh;
+            overflow: hidden;
+            border: 2px solid #2a52d8;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(42, 82, 216, 0.5);
+        }
+        
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: linear-gradient(to bottom, #0a0a2a, #1a1a40);
+        }
+        
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 5px #000;
+            z-index: 10;
+        }
+        
+        #score, #lives, #level {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid #2a52d8;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 10;
+        }
+        
+        .control-btn {
+            width: 70px;
+            height: 70px;
+            background: rgba(42, 82, 216, 0.7);
+            border: 2px solid #4a6ef0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            user-select: none;
+            box-shadow: 0 0 10px rgba(74, 110, 240, 0.5);
+        }
+        
+        #fire-btn {
+            background: rgba(216, 42, 42, 0.7);
+            border: 2px solid #f04a4a;
+            box-shadow: 0 0 10px rgba(240, 74, 74, 0.5);
+        }
+        
+        #start-screen, #game-over, #level-complete {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            text-align: center;
+            z-index: 20;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #4a6ef0;
+            text-shadow: 0 0 10px #4a6ef0;
+        }
+        
+        h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #4a6ef0;
+        }
+        
+        p {
+            font-size: 18px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            max-width: 80%;
+        }
+        
+        button {
+            background: linear-gradient(to right, #2a52d8, #4a6ef0);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(74, 110, 240, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 5px rgba(74, 110, 240, 0.5);
+        }
+        
+        #game-over, #level-complete {
+            display: none;
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #aaa;
+        }
+        
+        .planet {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle at 30% 30%, #3a7a3a, #2a5a2a);
+            border-radius: 50%;
+            box-shadow: 0 0 20px #2a5a2a;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        
+        <div class="planet"></div>
+        
+        <div id="ui">
+            <div id="score">Очки: 0</div>
+            <div id="level">Уровень: 1</div>
+            <div id="lives">Жизни: ❤️❤️❤️</div>
+        </div>
+        
+        <div id="controls">
+            <div class="control-btn" id="left-btn">←</div>
+            <div class="control-btn" id="fire-btn">⚡</div>
+            <div class="control-btn" id="right-btn">→</div>
+        </div>
+        
+        <div id="start-screen">
+            <h1>КОСМИЧЕСКИЙ ЗАЩИТНИК</h1>
+            <p>Защитите планету от астероидов! Управляйте кораблем и стреляйте по астероидам, пока они не уничтожили вашу планету.</p>
+            <button id="start-button">НАЧАТЬ ИГРУ</button>
+            <div class="instructions">
+                Используйте кнопки ← и → для движения<br>
+                Кнопка ⚡ для стрельбы
+            </div>
+        </div>
+        
+        <div id="game-over">
+            <h1>ИГРА ОКОНЧЕНА</h1>
+            <p id="final-score">Ваш счет: 0</p>
+            <p id="final-level">Уровень: 1</p>
+            <button id="restart-button">ИГРАТЬ СНОВА</button>
+        </div>
+        
+        <div id="level-complete">
+            <h1>УРОВЕНЬ ПРОЙДЕН!</h1>
+            <p id="level-score">Очки за уровень: 0</p>
+            <button id="next-level-button">СЛЕДУЮЩИЙ УРОВЕНЬ</button>
+        </div>
+    </div>
+
+    <script>
+        // Получаем элементы DOM
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over');
+        const levelCompleteScreen = document.getElementById('level-complete');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const nextLevelButton = document.getElementById('next-level-button');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const livesElement = document.getElementById('lives');
+        const finalScoreElement = document.getElementById('final-score');
+        const finalLevelElement = document.getElementById('final-level');
+        const levelScoreElement = document.getElementById('level-score');
+        const leftBtn = document.getElementById('left-btn');
+        const rightBtn = document.getElementById('right-btn');
+        const fireBtn = document.getElementById('fire-btn');
+        
+        // Устанавливаем размеры canvas
+        function resizeCanvas() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+        }
+        
+        // Игровые переменные
+        let gameRunning = false;
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let asteroids = [];
+        let bullets = [];
+        let particles = [];
+        let stars = [];
+        let lastAsteroidTime = 0;
+        let asteroidInterval = 1500;
+        let player = {
+            x: 0,
+            y: 0,
+            width: 60,
+            height: 40,
+            speed: 5,
+            color: '#4a6ef0'
+        };
+        
+        // Инициализация игры
+        function initGame() {
+            resizeCanvas();
+            
+            // Сброс игровых переменных
+            score = 0;
+            level = 1;
+            lives = 3;
+            asteroids = [];
+            bullets = [];
+            particles = [];
+            stars = [];
+            asteroidInterval = 1500;
+            
+            // Установка позиции игрока
+            player.x = canvas.width / 2 - player.width / 2;
+            player.y = canvas.height - 100;
+            
+            // Создание звездного фона
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+            
+            // Обновление UI
+            updateScore();
+            updateLevel();
+            updateLives();
+            
+            // Запуск игры
+            gameRunning = true;
+            startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            levelCompleteScreen.style.display = 'none';
+            
+            // Запуск игрового цикла
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Игровой цикл
+        function gameLoop(timestamp) {
+            if (!gameRunning) return;
+            
+            // Очистка canvas
+            ctx.fillStyle = 'rgba(10, 10, 42, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Отрисовка и обновление звезд
+            drawStars();
+            
+            // Создание новых астероидов
+            if (timestamp - lastAsteroidTime > asteroidInterval) {
+                createAsteroid();
+                lastAsteroidTime = timestamp;
+                
+                // Увеличиваем сложность
+                asteroidInterval = Math.max(500, asteroidInterval - 10);
+            }
+            
+            // Обновление и отрисовка игрока
+            drawPlayer();
+            
+            // Обновление и отрисовка астероидов
+            updateAsteroids();
+            
+            // Обновление и отрисовка пуль
+            updateBullets();
+            
+            // Обновление и отрисовка частиц
+            updateParticles();
+            
+            // Проверка столкновений
+            checkCollisions();
+            
+            // Проверка завершения уровня
+            if (asteroids.length === 0 && timestamp - lastAsteroidTime > 3000) {
+                completeLevel();
+            }
+            
+            // Продолжение игрового цикла
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Отрисовка звездного фона
+        function drawStars() {
+            ctx.fillStyle = 'white';
+            for (let star of stars) {
+                // Обновление позиции звезды
+                star.y += star.speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+                
+                // Отрисовка звезды
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // Отрисовка игрока
+        function drawPlayer() {
+            // Корпус корабля
+            ctx.fillStyle = player.color;
+            ctx.beginPath();
+            ctx.moveTo(player.x + player.width / 2, player.y);
+            ctx.lineTo(player.x + player.width, player.y + player.height);
+            ctx.lineTo(player.x, player.y + player.height);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Кабина
+            ctx.fillStyle = '#a0c0ff';
+            ctx.beginPath();
+            ctx.arc(player.x + player.width / 2, player.y + 15, 10, 0, Math.PI, true);
+            ctx.fill();
+            
+            // Двигатели
+            ctx.fillStyle = '#ff6b4a';
+            ctx.fillRect(player.x + 10, player.y + player.height, 15, 10);
+            ctx.fillRect(player.x + player.width - 25, player.y + player.height, 15, 10);
+            
+            // Анимация двигателей
+            if (Math.floor(Date.now() / 100) % 2 === 0) {
+                ctx.fillStyle = '#ff9b4a';
+                ctx.fillRect(player.x + 12, player.y + player.height + 10, 11, 8);
+                ctx.fillRect(player.x + player.width - 23, player.y + player.height + 10, 11, 8);
+            }
+        }
+        
+        // Создание астероида
+        function createAsteroid() {
+            const size = Math.random() * 30 + 20;
+            asteroids.push({
+                x: Math.random() * (canvas.width - size),
+                y: -size,
+                width: size,
+                height: size,
+                speed: Math.random() * 2 + 1 + level * 0.2,
+                rotation: 0,
+                rotationSpeed: (Math.random() - 0.5) * 0.05,
+                color: `hsl(${Math.random() * 30 + 20}, 70%, 40%)`
+            });
+        }
+        
+        // Обновление астероидов
+        function updateAsteroids() {
+            for (let i = asteroids.length - 1; i >= 0; i--) {
+                const asteroid = asteroids[i];
+                
+                // Обновление позиции
+                asteroid.y += asteroid.speed;
+                asteroid.rotation += asteroid.rotationSpeed;
+                
+                // Отрисовка астероида
+                ctx.save();
+                ctx.translate(asteroid.x + asteroid.width / 2, asteroid.y + asteroid.height / 2);
+                ctx.rotate(asteroid.rotation);
+                
+                ctx.fillStyle = asteroid.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, asteroid.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Детали астероида
+                ctx.fillStyle = '#5a3a2a';
+                ctx.beginPath();
+                ctx.arc(-asteroid.width / 4, -asteroid.height / 4, asteroid.width / 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(asteroid.width / 4, asteroid.height / 4, asteroid.width / 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+                
+                // Удаление астероидов, улетевших за экран
+                if (asteroid.y > canvas.height + asteroid.height) {
+                    asteroids.splice(i, 1);
+                }
+            }
+        }
+        
+        // Создание выстрела
+        function createBullet() {
+            bullets.push({
+                x: player.x + player.width / 2 - 2,
+                y: player.y,
+                width: 4,
+                height: 15,
+                speed: 8,
+                color: '#ffff4a'
+            });
+        }
+        
+        // Обновление пуль
+        function updateBullets() {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const bullet = bullets[i];
+                
+                // Обновление позиции
+                bullet.y -= bullet.speed;
+                
+                // Отрисовка пули
+                ctx.fillStyle = bullet.color;
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                
+                // Свечение пули
+                ctx.fillStyle = 'rgba(255, 255, 100, 0.5)';
+                ctx.fillRect(bullet.x - 2, bullet.y - 2, bullet.width + 4, bullet.height + 4);
+                
+                // Удаление пуль, улетевших за экран
+                if (bullet.y < -bullet.height) {
+                    bullets.splice(i, 1);
+                }
+            }
+        }
+        
+        // Создание частиц взрыва
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 15; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    size: Math.random() * 5 + 2,
+                    speedX: (Math.random() - 0.5) * 4,
+                    speedY: (Math.random() - 0.5) * 4,
+                    color: color,
+                    life: 1.0
+                });
+            }
+        }
+        
+        // Обновление частиц
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const particle = particles[i];
+                
+                // Обновление позиции
+                particle.x += particle.speedX;
+                particle.y += particle.speedY;
+                particle.life -= 0.02;
+                
+                // Отрисовка частицы
+                ctx.globalAlpha = particle.life;
+                ctx.fillStyle = particle.color;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                
+                // Удаление "мертвых" частиц
+                if (particle.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+        
+        // Проверка столкновений
+        function checkCollisions() {
+            // Проверка столкновений пуль с астероидами
+            for (let i = asteroids.length - 1; i >= 0; i--) {
+                const asteroid = asteroids[i];
+                
+                for (let j = bullets.length - 1; j >= 0; j--) {
+                    const bullet = bullets[j];
+                    
+                    if (
+                        bullet.x < asteroid.x + asteroid.width &&
+                        bullet.x + bullet.width > asteroid.x &&
+                        bullet.y < asteroid.y + asteroid.height &&
+                        bullet.y + bullet.height > asteroid.y
+                    ) {
+                        // Столкновение пули с астероидом
+                        createExplosion(
+                            asteroid.x + asteroid.width / 2,
+                            asteroid.y + asteroid.height / 2,
+                            asteroid.color
+                        );
+                        
+                        asteroids.splice(i, 1);
+                        bullets.splice(j, 1);
+                        
+                        score += Math.floor(asteroid.width);
+                        updateScore();
+                        break;
+                    }
+                }
+            }
+            
+            // Проверка столкновений астероидов с игроком
+            for (let i = asteroids.length - 1; i >= 0; i--) {
+                const asteroid = asteroids[i];
+                
+                if (
+                    player.x < asteroid.x + asteroid.width &&
+                    player.x + player.width > asteroid.x &&
+                    player.y < asteroid.y + asteroid.height &&
+                    player.y + player.height > asteroid.y
+                ) {
+                    // Столкновение игрока с астероидом
+                    createExplosion(
+                        player.x + player.width / 2,
+                        player.y + player.height / 2,
+                        player.color
+                    );
+                    
+                    asteroids.splice(i, 1);
+                    lives--;
+                    updateLives();
+                    
+                    if (lives <= 0) {
+                        gameOver();
+                    }
+                    
+                    break;
+                }
+            }
+        }
+        
+        // Завершение уровня
+        function completeLevel() {
+            gameRunning = false;
+            levelScoreElement.textContent = `Очки за уровень: ${score}`;
+            levelCompleteScreen.style.display = 'flex';
+        }
+        
+        // Конец игры
+        function gameOver() {
+            gameRunning = false;
+            finalScoreElement.textContent = `Ваш счет: ${score}`;
+            finalLevelElement.textContent = `Уровень: ${level}`;
+            gameOverScreen.style.display = 'flex';
+        }
+        
+        // Переход на следующий уровень
+        function nextLevel() {
+            level++;
+            asteroidInterval = Math.max(500, 1500 - level * 100);
+            updateLevel();
+            levelCompleteScreen.style.display = 'none';
+            gameRunning = true;
+            lastAsteroidTime = performance.now();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Обновление счета
+        function updateScore() {
+            scoreElement.textContent = `Очки: ${score}`;
+        }
+        
+        // Обновление уровня
+        function updateLevel() {
+            levelElement.textContent = `Уровень: ${level}`;
+        }
+        
+        // Обновление жизней
+        function updateLives() {
+            let hearts = '';
+            for (let i = 0; i < lives; i++) {
+                hearts += '❤️';
+            }
+            livesElement.innerHTML = `Жизни: ${hearts}`;
+        }
+        
+        // Обработка управления
+        function setupControls() {
+            let leftPressed = false;
+            let rightPressed = false;
+            
+            // Кнопка влево
+            leftBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                leftPressed = true;
+            });
+            
+            leftBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                leftPressed = false;
+            });
+            
+            // Кнопка вправо
+            rightBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                rightPressed = true;
+            });
+            
+            rightBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                rightPressed = false;
+            });
+            
+            // Кнопка огня
+            fireBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (gameRunning) {
+                    createBullet();
+                }
+            });
+            
+            // Обработка движения
+            function handleMovement() {
+                if (leftPressed && player.x > 0) {
+                    player.x -= player.speed;
+                }
+                
+                if (rightPressed && player.x < canvas.width - player.width) {
+                    player.x += player.speed;
+                }
+                
+                requestAnimationFrame(handleMovement);
+            }
+            
+            handleMovement();
+        }
+        
+        // Инициализация при загрузке
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            setupControls();
+            startScreen.style.display = 'flex';
+        });
+        
+        // Обработка изменения размера окна
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Обработка кнопок
+        startButton.addEventListener('click', initGame);
+        restartButton.addEventListener('click', initGame);
+        nextLevelButton.addEventListener('click', nextLevel);
+    </script>
+</body>
+</html>
