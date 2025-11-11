@@ -21,6 +21,7 @@
             --warning: #fbbf24;
             --error: #f87171;
             --btn-camera: #0088cc;
+            --game-btn: linear-gradient(135deg, #4b6cb7 0%, #182848);
         }
         
         /* Светлая тема */
@@ -30,6 +31,7 @@
             --text-primary: #1e293b;
             --card-bg: rgba(255, 255, 255, 0.9);
             --btn-camera: #0088cc;
+            --game-btn: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%);
         }
         
         /* Темная тема */
@@ -39,6 +41,7 @@
             --text-primary: #f1f5f9;
             --card-bg: rgba(30, 41, 59, 0.9);
             --btn-camera: #0088cc;
+            --game-btn: linear-gradient(135deg, #0f0c29 0%, #302b63 100%);
         }
         
         body {
@@ -105,8 +108,8 @@
         
         /* Выбор класса */
         .class-section {
-            margin-bottom: auto;
-            padding: 20px 0;
+            margin-bottom: 20px;
+            padding: 15px 0;
         }
         
         .class-dropdown {
@@ -166,6 +169,69 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+        }
+        
+        /* Секция игры */
+        .game-section {
+            margin: 15px 0 25px;
+            padding: 10px 0;
+        }
+        
+        .game-btn {
+            background: var(--game-btn);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0, 15, 64, 0.4);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+        
+        .game-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+        
+        .game-btn:hover::before {
+            opacity: 1;
+            transform: rotate(45deg) translate(10%, 10%);
+        }
+        
+        .game-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(0, 30, 100, 0.6);
+        }
+        
+        .game-btn:active {
+            transform: translateY(1px);
+        }
+        
+        [data-theme="light"] .game-btn {
+            box-shadow: 0 4px 15px rgba(26, 42, 108, 0.3);
+        }
+        
+        [data-theme="light"] .game-btn:hover {
+            box-shadow: 0 6px 20px rgba(26, 42, 108, 0.5);
         }
         
         /* Чипсы внизу страницы */
@@ -245,13 +311,20 @@
             }
             
             .class-dropdown,
-            .class-btn {
+            .class-btn,
+            .game-btn {
                 padding: 16px;
                 font-size: 16px;
             }
             
-            .class-btn {
+            .class-btn,
+            .game-btn {
                 min-height: 65px;
+            }
+            
+            .game-btn {
+                font-size: 16px;
+                gap: 8px;
             }
             
             .chip {
@@ -306,6 +379,14 @@
             </button>
         </div>
 
+        <!-- НОВАЯ СЕКЦИЯ ИГРЫ -->
+        <div class="game-section">
+            <button class="game-btn" id="gameBtn">
+                <span>🚀</span>
+                <span>КОСМИЧЕСКИЙ ЗАЩИТНИК</span>
+            </button>
+        </div>
+
         <!-- Чипсы внизу страницы -->
         <div class="bottom-chips">
             <button class="chip" onclick="refreshAll()">
@@ -357,7 +438,7 @@
                 this.disabled = true;
                 
                 // Задержка для демонстрации анимации
-                setTimeout(() => {
+               	setTimeout(() => {
                     // Переход на страницу класса
                     const classPage = `${selectedClass}class.html`;
                     showNotification(`Переход к ${selectedClass} классу`, 'success');
@@ -374,6 +455,10 @@
                     }, 2000);
                 }, 1000);
             });
+            
+            // Инициализация кнопки игры
+            const gameBtn = document.getElementById('gameBtn');
+            gameBtn.addEventListener('click', openGame);
         });
 
         // Обновление часов
@@ -393,13 +478,25 @@
             localStorage.setItem('theme', theme);
             localStorage.setItem('themeIndex', currentThemeIndex);
             
+            // Обновление иконки темы
+            updateThemeIcon(theme);
+            
             const themeNames = {
-                'standard': '🔵 Стандартная',
-                'light': '⚪ Светлая', 
-                'dark': '⚫ Темная'
+                'standard': '🌈 Стандартная тема',
+                'light': '☀️ Светлая тема', 
+                'dark': '🌙 Темная тема'
             };
             
             showNotification(themeNames[theme]);
+        }
+
+        function updateThemeIcon(theme) {
+            const iconMap = {
+                'standard': '🌈',
+                'light': '☀️',
+                'dark': '🌙'
+            };
+            document.querySelector('.theme-toggle span:first-child').textContent = iconMap[theme] || '🌈';
         }
 
         function loadTheme() {
@@ -408,6 +505,7 @@
             
             currentThemeIndex = savedIndex;
             document.body.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
         }
 
         // Уведомления
@@ -419,12 +517,47 @@
             
             setTimeout(() => {
                 toast.style.display = 'none';
-            }, 2000);
+            }, 2500);
         }
 
         function refreshAll() {
-            showNotification('Обновление интерфейса');
+            showNotification('Интерфейс обновлен', 'success');
             // Можно добавить дополнительную логику обновления если нужно
+        }
+        
+        // Открытие игры
+        function openGame() {
+            const originalText = this.innerHTML;
+            this.innerHTML = '<span>⏳</span><span>Загрузка игры...</span>';
+            this.disabled = true;
+            
+            showNotification('Запуск «Космического защитника»', 'success');
+            
+            // Проверка существования файла игры
+            fetch('math-game.html', { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        setTimeout(() => {
+                            window.location.href = 'math-game.html';
+                        }, 800);
+                    } else {
+                        throw new Error('Игра не найдена');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки игры:', error);
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                    
+                    showNotification('Игра временно недоступна', 'error');
+                    
+                    // Резервный вариант через 1.5 секунды
+                    setTimeout(() => {
+                        if (confirm('Открыть демо-версию «Космического защитника»?')) {
+                            window.open('https://example.com/space-defender-demo', '_blank');
+                        }
+                    }, 1500);
+                });
         }
     </script>
 </body>
